@@ -6,18 +6,42 @@
 
 using DataStructures
 
-# Abstraction of a Graph structure. 
-#Used to generate all of the other graphs.
-abstract abstractGraph{V::Int64,E::Int64}
-
 #
-type Graph <: abstractGraph{V::Int64,E::Int64}
-	filename::ASCIIString
-	asAdjList::Function
-	asAdjMatrix::Function
+type simpleGraph
+"""
+"""
+	# Properties of the Graph
+	num_vertex::Int64
+	num_edge::Int64
+	mean_degree::Float64
+	empirical_dist::Array{Float64,1}
+
+	function simpleGraph(filename::ASCIIString)
+	"""
+	"""	
+		println("Inside the Class Graph")
+	end
+
+	function make_report()
+	"""
+	"""
+
+	end
 end
 
 #
 type demoGraph
+	function Graph()
+		println("Inside the Class Demo Graph")
+	end
+end
 
+function asAdjList(G::simpleGraph)
+"""
+"""
+end
+
+function asAdjMatrix(G::simpleGraph)
+"""
+"""	
 end

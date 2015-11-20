@@ -7,10 +7,8 @@ module graphtheoryufrj
 using DataStructures, Compat
 
 export 
-	abstractGraph,
-	
 	# Graph data structure
-	Graph,
+	simpleGraph,
 	demoGraph,
 
 	# Algorithms
@@ -24,8 +22,8 @@ export
 	plot_dfs
 
 # Load source files
-include("algorithms.jl")
 include("graphstructure.jl")
+include("algorithms.jl")
 include("plot.jl")
 
 end

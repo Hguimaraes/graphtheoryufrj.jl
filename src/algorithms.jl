@@ -3,11 +3,14 @@
 #
 #
 
-function bfs(G::abstractGraph, s = 1)
+function bfs(G::simpleGraph, s = 1)
+	println("Using BFS on the selected Graph...")
 end
 
-function fast_bfs(G::abstractGraph, s = 1)
+function fast_bfs(G::simpleGraph, s = 1)
+	println("Using Fast_BFS on the selected Graph...")
 end
 
-function dfs(G::abstractGraph, s = 1)
+function dfs(G::simpleGraph, s = 1)
+	println("Using DFS on the selected Graph...")
 end
