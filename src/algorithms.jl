@@ -3,8 +3,6 @@
 #
 #
 
-using graphstructure
-
 function bfs(G::abstractGraph, s = 1)
 end
 
