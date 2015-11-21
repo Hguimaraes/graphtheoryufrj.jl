@@ -2,4 +2,14 @@
 
 ## graphtheoryufrj.jl
 
-Julia package with graph implementations for the course "Graph Theory" at UFRJ.
+A Julia package with graph algorithms for the course <i>"Graph Theory" (COS242)</i> at UFRJ.
+
+## How to use it
+
+```Julia
+    Pkg.add("https://github.com/Hguimaraes/graphtheoryufrj.jl.git")
+    using graphtheoryufrj
+```
+
+## Performance test
+
