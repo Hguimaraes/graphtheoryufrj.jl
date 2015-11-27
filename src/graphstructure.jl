@@ -39,7 +39,15 @@ type simpleGraph
 
 		# Calculate the others information
 		this.num_edge = size(this.Graph)[1]
-		##this.mean_degree = ??
+		adjlist = graphtheoryufrj.asAdjList(this)
+
+		# Calculate the mean degree of the graph.
+		sum = 0
+		@inbounds for i in 1:this.num_edge
+			sum = sum + length(adjlist[i])
+		end
+		this.mean_degree = (sum/this.num_edge)
+
 		##this.empirical_dist = ??
 
 		this.make_report = function(outfilename::ASCIIString)
