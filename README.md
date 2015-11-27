@@ -7,7 +7,7 @@ A Julia package with graph algorithms for the course <i>"Graph Theory" (COS242)<
 ## How to use it
 
 ```Julia
-    Pkg.add("https://github.com/Hguimaraes/graphtheoryufrj.jl.git")
+    Pkg.clone("https://github.com/Hguimaraes/graphtheoryufrj.jl.git")
     using graphtheoryufrj
 ```
 
