@@ -78,6 +78,27 @@ function asAdjList(G::simpleGraph)
 @output: This function return the Adjacency List (Which is a List of List) for
 	the given simpleGraph.
 """
+	vertex = G.num_vertex
+	edges = G.num_edge
+	adjlist = Array{Array{Int64}}(edges)
+
+	# Initialize the List
+	@inbounds @simd for i in 1:edges
+	  	@inbounds adjlist[i]=Array{Int64}(0)
+	end
+
+	#
+	@inbounds for i in 1:edges
+    	id, vert = G.Graph[i,:]
+    	push!(adjlist[id], vert)
+    	push!(adjlist[vert], id)
+    end
+
+	@inbounds @simd for i in 1:edges
+	  	@inbounds adjlist[i] = sort(adjlist[i])
+	end    
+
+	return adjlist
 end
 
 function asAdjMatrix(G::simpleGraph)
@@ -96,6 +117,7 @@ function asAdjMatrix(G::simpleGraph)
 	@inbounds @simd for i in 1:edges
     	rnum, cnum = G.Graph[i,:]
     	adjmatrix[rnum,cnum] = 1
+    	adjmatrix[cnum,rnum] = 1
     end
 	return adjmatrix
 end
