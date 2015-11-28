@@ -1,7 +1,6 @@
 # graphstructure.jl
 # Authors : Heitor Guimaraes and Luiz Ciafrino
-#
-#
+# @brief: Module to handle basic graph manipulation
 
 type simpleGraph
 """
@@ -44,13 +43,19 @@ type simpleGraph
 		store the distance for empirical distance =#
 		sum = 0
 		this.empirical_dist = zeros(Float64, this.num_edge - 1)
+
 		@inbounds for i in 1:this.num_edge
 			degree = length(adjlist[i])
 			sum = sum + degree
-			this.empirical_dist[degree] += 1 
+			this.empirical_dist[degree] += 1
 		end
+
 		this.mean_degree = (sum/this.num_edge)
 		this.empirical_dist /= this.num_vertex
+
+		# Prevent memory issues
+		graphtxt = 0
+		adjlist = 0
 
 		this.make_report = function(outfilename::ASCIIString)
 		"""
@@ -133,16 +138,4 @@ function asAdjMatrix(G::simpleGraph)
     	adjmatrix[cnum,rnum] = 1
     end
 	return adjmatrix
-end
-
-function asAdjVector(G::simpleGraph)
-"""
-@brief: Function to take the graph abstraction and transform into an 
-	Adjacency Vector.
-@param G::simpleGraph A simple graph containing the relations between
-	the edges (vertices index). 
-@output: This function return the Adjacency Vector (Which is ...)
-	for the given simpleGraph.
-"""
-
 end
