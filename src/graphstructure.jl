@@ -1,6 +1,5 @@
-#
-#
-#
+# graphstructure.jl
+# Authors : Heitor Guimaraes and Luiz Ciafrino
 #
 #
 
@@ -41,14 +40,17 @@ type simpleGraph
 		this.num_edge = size(this.Graph)[1]
 		adjlist = graphtheoryufrj.asAdjList(this)
 
-		# Calculate the mean degree of the graph.
+		#= Calculate the mean degree of the graph and
+		store the distance for empirical distance =#
 		sum = 0
+		this.empirical_dist = zeros(Float64, this.num_edge - 1)
 		@inbounds for i in 1:this.num_edge
-			sum = sum + length(adjlist[i])
+			degree = length(adjlist[i])
+			sum = sum + degree
+			this.empirical_dist[degree] += 1 
 		end
 		this.mean_degree = (sum/this.num_edge)
-
-		##this.empirical_dist = ??
+		this.empirical_dist /= this.num_vertex
 
 		this.make_report = function(outfilename::ASCIIString)
 		"""
@@ -62,6 +64,10 @@ type simpleGraph
 			write(outfile, string("# n = ", this.num_vertex,"\n"))
 			write(outfile, string("# m = ", this.num_edge,"\n"))
 			write(outfile, string("# d_medio = ", this.mean_degree,"\n"))
+
+			for i in 1:length(this.empirical_dist)
+				write(outfile, string(i, " ", this.empirical_dist[i], "\n"))
+			end
 
 			# Close and save the file.
 			close(outfile)
@@ -86,7 +92,6 @@ function asAdjList(G::simpleGraph)
 @output: This function return the Adjacency List (Which is a List of List) for
 	the given simpleGraph.
 """
-	vertex = G.num_vertex
 	edges = G.num_edge
 	adjlist = Array{Array{Int64}}(edges)
 
@@ -128,4 +133,16 @@ function asAdjMatrix(G::simpleGraph)
     	adjmatrix[cnum,rnum] = 1
     end
 	return adjmatrix
+end
+
+function asAdjVector(G::simpleGraph)
+"""
+@brief: Function to take the graph abstraction and transform into an 
+	Adjacency Vector.
+@param G::simpleGraph A simple graph containing the relations between
+	the edges (vertices index). 
+@output: This function return the Adjacency Vector (Which is ...)
+	for the given simpleGraph.
+"""
+
 end
