@@ -15,10 +15,10 @@ type simpleGraph
 	num_edge::Int64
 	mean_degree::Float64
 	empirical_dist::Array{Float64, 1}
-	Graph::Array{Int64, 2}
+	Graph::Union{Array{Array{Int64},1}, Array{UInt8,2}}
 	make_report::Function
 
-	function simpleGraph(filename::ASCIIString)
+	function simpleGraph(filename::ASCIIString, format::ASCIIString = "adjlist")
 	"""
 	@brief: Constructor of the composite type simpleGraph. This method
 		read the text file and construct the Graph as a List with integer
@@ -26,36 +26,75 @@ type simpleGraph
 		a report if the user ask for it.
 	@param filename::ASCIIString Name or path of the file contain the graph
 		information. This function expect an ASCIIString.
+	@param format::ASCIIString Option for specify the type of representation
+		for the graph. Options are: 'adjlist' or 'adjmatrix'.
 	"""	
 		# Instantiate the Class
 		this = new()
 
-		# Read the text file and get direct information.
-		graphtxt = readdlm(filename)
-		this.num_vertex = graphtxt[1]
-		this.Graph = graphtxt[2:end, :]
+		# Read the text file
+		infile = open(filename)
+		this.num_vertex = parse(Int64, readline(infile))
 
-		# Calculate the others information
-		this.num_edge = size(this.Graph)[1]
-		adjlist = graphtheoryufrj.asAdjList(this)
+		lines = readlines(infile)
+		this.num_edge = size(lines)[1]
+		this.empirical_dist = zeros(Float64, this.num_edge - 1)
 
+		# Return the selected structure
+		if format == "adjlist"
+		"""
+		@brief: With this flag you can take the graph abstraction and transform
+			into an Adjacency List.
+		"""
+			# Pre-allocate the structure
+			this.Graph = Array{Array{Int64}}(this.num_vertex)
+			
+			# Initialize with Zeros
+			@inbounds @simd for i in 1:this.num_vertex
+   	 			this.Graph[i] = Array{Int64}(0)
+    		end
+
+    		# Fill the Adjacency List
+			@time @inbounds for i in lines
+				vertex = parse(Int64,split(i)[1])
+				edge = parse(Int64,split(i)[2])
+				push!(this.Graph[vertex], edge)
+				push!(this.Graph[edge], vertex)
+			end
+
+		elseif format == "adjmatrix"
+		"""
+		@brief: With this flag you can take the graph abstraction and transform
+			into an Adjacency Matrix.
+		"""
+			# Pre-allocate the structure and initialize with zeros
+			this.Graph = zeros(UInt8, this.num_vertex, this.num_vertex)
+
+			@time @inbounds for i in lines
+				rnum = parse(Int64,split(i)[1])
+				cnum = parse(Int64,split(i)[2])
+				this.Graph[rnum, cnum] = 1
+				this.Graph[cnum, rnum] = 1
+			end
+		
+		else
+			error(""" Invalid format selected, options are:\n
+				* adjlist\n
+				* adjmatrix\n
+				Example: graph = simpleGraph(\"mygraph.txt\", \"adjmatrix\")""")
+		end
+		
 		#= Calculate the mean degree of the graph and
 		store the distance for empirical distance =#
 		sum = 0
-		this.empirical_dist = zeros(Float64, this.num_edge - 1)
-
-		@inbounds for i in 1:this.num_edge
-			degree = length(adjlist[i])
+		@inbounds for i in 1:this.num_vertex
+			degree = (format == "adjmatrix") ? +(this.Graph[i,:]...) : length(this.Graph[i])
 			sum = sum + degree
 			this.empirical_dist[degree] += 1
 		end
 
 		this.mean_degree = (sum/this.num_edge)
 		this.empirical_dist /= this.num_vertex
-
-		# Prevent memory issues
-		graphtxt = 0
-		adjlist = 0
 
 		this.make_report = function(outfilename::ASCIIString)
 		"""
@@ -77,6 +116,8 @@ type simpleGraph
 			# Close and save the file.
 			close(outfile)
 		end
+
+		close(infile)
 		return this
 	end
 end
@@ -86,56 +127,4 @@ type demoGraph
 	function demoGraph()
 		println("Inside the Class Demo Graph")
 	end
-end
-
-function asAdjList(G::simpleGraph)
-"""
-@brief: Function to take the graph abstraction and transform into an 
-	Adjacency List.
-@param G::simpleGraph A simple graph containing the relations between
-	the edges (vertices index).
-@output: This function return the Adjacency List (Which is a List of List) for
-	the given simpleGraph.
-"""
-	edges = G.num_edge
-	adjlist = Array{Array{Int64}}(edges)
-
-	# Initialize the List
-	@inbounds @simd for i in 1:edges
-	  	@inbounds adjlist[i]=Array{Int64}(0)
-	end
-
-	#
-	@inbounds for i in 1:edges
-    	id, vert = G.Graph[i,:]
-    	push!(adjlist[id], vert)
-    	push!(adjlist[vert], id)
-    end
-
-	@inbounds @simd for i in 1:edges
-	  	@inbounds adjlist[i] = sort(adjlist[i])
-	end    
-
-	return adjlist
-end
-
-function asAdjMatrix(G::simpleGraph)
-"""
-@brief: Function to take the graph abstraction and transform into an 
-	Adjacency Matrix.
-@param G::simpleGraph A simple graph containing the relations between
-	the edges (vertices index). 
-@output: This function return the Adjacency Matrix (Which is a simple Matrix of
-	0's and 1's) for the given simpleGraph.
-"""
-	vertex = G.num_vertex
-	edges = G.num_edge
-	adjmatrix = zeros(Int64, vertex, vertex)
-
-	@inbounds @simd for i in 1:edges
-    	rnum, cnum = G.Graph[i,:]
-    	adjmatrix[rnum,cnum] = 1
-    	adjmatrix[cnum,rnum] = 1
-    end
-	return adjmatrix
 end

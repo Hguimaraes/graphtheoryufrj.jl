@@ -1,7 +1,8 @@
-#
-#
-#
-#
+# graphstructure.jl
+# Authors : Heitor Guimaraes and Luiz Ciafrino
+# @brief: Module to handle basic plot for the graph algorithm's
+
+using Colors
 
 function plot_graph(G::simpleGraph)
 	println(" -- Shape of the Graph --")
