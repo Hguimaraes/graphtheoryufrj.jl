@@ -18,7 +18,7 @@ type simpleGraph
 	Graph::Union{Array{Array{Int64},1}, Array{UInt8,2}}
 	make_report::Function
 
-	function simpleGraph(filename::ASCIIString, format::ASCIIString = "adjlist")
+	function simpleGraph(filename::ASCIIString; format::ASCIIString = "adjlist")
 	"""
 	@brief: Constructor of the composite type simpleGraph. This method
 		read the text file and construct the Graph as a List with integer
