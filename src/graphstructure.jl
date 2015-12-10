@@ -87,10 +87,13 @@ type simpleGraph
 		#= Calculate the mean degree of the graph and
 		store the distance for empirical distance =#
 		sum = 0
-		@inbounds for i in 1:this.num_vertex
+		for i in 1:this.num_vertex - 1
 			degree = (format == "adjmatrix") ? +(this.Graph[i,:]...) : length(this.Graph[i])
-			sum = sum + degree
-			this.empirical_dist[degree] += 1
+			if degree != 0
+				sum = sum + degree
+				this.empirical_dist[degree] += 1
+			end	
+
 		end
 
 		this.mean_degree = (sum/this.num_edge)
@@ -110,7 +113,9 @@ type simpleGraph
 			write(outfile, string("# d_medio = ", this.mean_degree,"\n"))
 
 			for i in 1:length(this.empirical_dist)
-				write(outfile, string(i, " ", this.empirical_dist[i], "\n"))
+				if this.empirical_dist[i] != 0
+					write(outfile, string(i, " ", this.empirical_dist[i], "\n"))
+				end
 			end
 
 			# Close and save the file.
