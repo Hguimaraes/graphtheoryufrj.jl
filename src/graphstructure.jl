@@ -13,12 +13,11 @@ type simpleGraph
 	# Properties of the Graph
 	num_vertex::Int64
 	num_edge::Int64
-	mean_degree::Float64
-	empirical_dist::Array{Float64, 1}
 	Graph::Union{Array{Array{Int64},1}, Array{UInt8,2}}
 	make_report::Function
+	format_graph::ASCIIString
 
-	function simpleGraph(filename::ASCIIString; format::ASCIIString = "adjlist")
+	function simpleGraph(filename::ASCIIString, format::ASCIIString = "adjlist")
 	"""
 	@brief: Constructor of the composite type simpleGraph. This method
 		read the text file and construct the Graph as a List with integer
@@ -38,7 +37,7 @@ type simpleGraph
 
 		lines = readlines(infile)
 		this.num_edge = size(lines)[1]
-		this.empirical_dist = zeros(Float64, this.num_edge - 1)
+		this.format_graph = format
 
 		# Return the selected structure
 		if format == "adjlist"
@@ -69,14 +68,12 @@ type simpleGraph
 		"""
 			# Pre-allocate the structure and initialize with zeros
 			this.Graph = zeros(UInt8, this.num_vertex, this.num_vertex)
-
 			@time @inbounds for i in lines
 				rnum = parse(Int64,split(i)[1])
 				cnum = parse(Int64,split(i)[2])
 				this.Graph[rnum, cnum] = 1
 				this.Graph[cnum, rnum] = 1
 			end
-		
 		else
 			error(""" Invalid format selected, options are:\n
 				* adjlist\n
@@ -84,21 +81,6 @@ type simpleGraph
 				Example: graph = simpleGraph(\"mygraph.txt\", \"adjmatrix\")""")
 		end
 		
-		#= Calculate the mean degree of the graph and
-		store the distance for empirical distance =#
-		sum = 0
-		for i in 1:this.num_vertex - 1
-			degree = (format == "adjmatrix") ? +(this.Graph[i,:]...) : length(this.Graph[i])
-			if degree != 0
-				sum = sum + degree
-				this.empirical_dist[degree] += 1
-			end	
-
-		end
-
-		this.mean_degree = (sum/this.num_edge)
-		this.empirical_dist /= this.num_vertex
-
 		this.make_report = function(outfilename::ASCIIString)
 		"""
 		@brief: Method to make a small report with usefull informations
@@ -106,15 +88,18 @@ type simpleGraph
 		@param outfilename String with the name of the report filename
 			in the ASCIIString format. 
 		"""
+			# Get the mean degree and the empirical distance.
+			mean_degree, empirical_dist = graph_properties(this)
+
 			# Open the file and write the information on it.
 			outfile = open(outfilename, "w")
 			write(outfile, string("# n = ", this.num_vertex,"\n"))
 			write(outfile, string("# m = ", this.num_edge,"\n"))
-			write(outfile, string("# d_medio = ", this.mean_degree,"\n"))
+			write(outfile, string("# d_medio = ", mean_degree,"\n"))
 
-			for i in 1:length(this.empirical_dist)
-				if this.empirical_dist[i] != 0
-					write(outfile, string(i, " ", this.empirical_dist[i], "\n"))
+			for i in 1:length(empirical_dist)
+				if empirical_dist[i] != 0
+					write(outfile, string(i, " ", empirical_dist[i], "\n"))
 				end
 			end
 
@@ -132,4 +117,24 @@ type demoGraph
 	function demoGraph()
 		println("Inside the Class Demo Graph")
 	end
+end
+
+function graph_properties(G::simpleGraph)
+	#= Calculate the mean degree of the graph and
+	store the distance for empirical distance =#
+	empirical_dist = zeros(Float64, G.num_edge - 1)
+	mean_degree = 0.0
+	sum = 0
+
+	for i in 1:G.num_vertex
+		degree = (G.format_graph == "adjmatrix") ? +(G.Graph[:,i]...) : length(G.Graph[i])
+		if degree != 0
+			sum += degree
+			empirical_dist[degree] += 1
+		end	
+	end
+	
+	mean_degree = (sum/G.num_edge)
+	empirical_dist /= G.num_vertex
+	return mean_degree, empirical_dist
 end

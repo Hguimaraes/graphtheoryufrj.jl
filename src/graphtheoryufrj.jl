@@ -10,9 +10,8 @@ export
 	# Graph data structure
 	simpleGraph,
 	demoGraph,
-	asAdjList,
-	asAdjMatrix,
-
+	graph_properties,
+	
 	# Algorithms
 	bfs,
 	fast_bfs,
