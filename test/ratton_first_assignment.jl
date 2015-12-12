@@ -20,7 +20,7 @@ function test_one()
 	finally
 		close(outfile)
 	end
-	#=# subdblp_report Graph.
+	# subdblp_report Graph.
 	outfile = open("subdblp_report.txt", "w")
 	try
 		subdblp_list = simpleGraph("../assets/subdblp.txt")
@@ -44,7 +44,7 @@ function test_one()
 		error("Error in \"test_one\" function operating on the dblp_report file.")
 	finally
 		close(outfile)
-	end=# 
+	end 
 
 	return "TEST_ONE_SUCESS"
 end
