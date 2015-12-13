@@ -2,7 +2,7 @@
 # Authors : Heitor Guimaraes and Luiz Ciafrino
 # @brief: Module with some algorithms for graphs
 
-function bfs(G::Array{Array{Int64},1}; s=1)
+function bfs(G::Array{Array{Int64},1}; s = 1)
 """
 """
   l = length(G)
@@ -13,7 +13,7 @@ function bfs(G::Array{Array{Int64},1}; s=1)
   fill!(layer,-1)
 
   @simd for i in 1:length(parents)
-    @inbounds parents[i]=Array{Int64}(0)
+    @inbounds parents[i] = Array{Int64}(0)
   end
 
   q = Queue(UInt64)
@@ -23,11 +23,11 @@ function bfs(G::Array{Array{Int64},1}; s=1)
   while !isempty(q)
     u = dequeue!(q)
     @inbounds for i in G[u]
-      @inbounds if tag[i]==0
-        @inbounds tag[i]=1
+      @inbounds if tag[i] == 0
+        @inbounds tag[i] = 1
 
         if layer[i] == -1
-          layer[i] = layer[u]+1
+          layer[i] = layer[u] + 1
         end
         
         @inbounds push!(parents[u], i)
@@ -40,7 +40,7 @@ function bfs(G::Array{Array{Int64},1}; s=1)
   return layer,parents,tag
 end
 
-function bfs(G::Array{UInt8,2}; s=1)
+function bfs(G::Array{UInt8,2}; s = 1)
 """
 """
   x_dim, y_dim = size(G)
@@ -52,7 +52,7 @@ function bfs(G::Array{UInt8,2}; s=1)
   fill!(layer,-1)
 
   @simd for i in 1:length(parents)
-    @inbounds parents[i]=Array{Int64}(0)
+    @inbounds parents[i] = Array{Int64}(0)
   end
 
   q = Queue(UInt64)
@@ -69,7 +69,7 @@ function bfs(G::Array{UInt8,2}; s=1)
           layer[i] = layer[u] + 1
         end
         
-        @inbounds push!(parents[u], i)
+        @inbounds push!(parents[u],i)
         enqueue!(q,i)
       end
     end
@@ -78,7 +78,109 @@ function bfs(G::Array{UInt8,2}; s=1)
   return layer,parents,tag
 end
 
-function has_cycle(G::Array{Array{Int64},1} ;s=1)
+function dfs(G::Array{Array{Int64},1}; s = 1)
+"""
+"""
+  l = length(G)
+  tag = zeros(UInt8,l)
+  parents = Array{Array{Int64,1}}(l)
+
+  @simd for i in 1:length(parents)
+    @inbounds parents[i] = Array{Int64}(0)
+  end
+
+  p = Stack(UInt64)
+  push!(p, s)
+  while !isempty(p)
+    u = pop!(p)
+    if tag[u] == 0
+      tag[u] = 1
+      for i in G[u]
+        push!(p,i)
+        if tag[i] == 0
+          push!(parents[u], i)
+        end
+      end
+    end
+  end
+
+  return parents,tag
+end
+
+function dfs(G::Array{UInt8,2}; s = 1)
+"""
+"""
+  x_dim, y_dim = size(G)
+  l = x_dim
+  tag = zeros(UInt8,l)
+  parents = Array{Array{Int64,1}}(l)
+
+  @simd for i in 1:length(parents)
+    @inbounds parents[i]=Array{Int64}(0)
+  end
+
+  p = Stack(UInt64)
+  push!(p, s)
+  while !isempty(p)
+    u = pop!(p)
+    if tag[u] == 0
+      tag[u] = 1
+      for i in 1:x_dim
+        if G[i,u] == 1
+          push!(p,i)
+          if tag[i] == 0
+            push!(parents[u], i)
+          end
+        end
+      end
+    end
+  end
+
+  return parents,tag
+end
+
+function fast_bfs(G::Array{Array{Int64},1}; s = 1)
+"""
+"""
+  l = length(G)
+  tag = zeros(UInt8,l)
+    
+  q = Queue(UInt64)
+  tag[s] = 1
+  enqueue!(q, s)
+  while !isempty(q)
+    u = dequeue!(q)
+    @inbounds for i in G[u]
+      @inbounds if tag[i] == 0
+        @inbounds tag[i] = 1
+        enqueue!(q,i)
+      end
+    end
+  end
+end
+
+function fast_bfs(G::Array{UInt8,2}; s = 1)
+"""
+"""
+  x_dim, y_dim = size(G)
+  l = x_dim
+  tag = zeros(UInt8,l)
+    
+  q = Queue(UInt64)
+  tag[s] = 1
+  enqueue!(q, s)
+  while !isempty(q)
+    u = dequeue!(q)
+    @inbounds for i in 1:x_dim
+      @inbounds if G[i,u] == 1 && tag[i] == 0
+        @inbounds tag[i] = 1
+        enqueue!(q,i)
+      end
+    end
+  end
+end
+
+function has_cycle(G::Array{Array{Int64},1}; s = 1)
 """
 """
   l = length(G)
@@ -128,61 +230,9 @@ function show_cycle(layer)
   parents = []
 
   for i in 1:length(layer)
-    if layer[i]>-1
+    if layer[i] > -1
       push!(parents,i)
     end
   end
   return parents
-end
-
-function dfs(G::Array{Array{Int64},1} ;s=1)
-"""
-"""
-  l = length(G)
-  tag = zeros(UInt8,l)
-  parents = Array{Array{Int64,1}}(l)
-
-  @simd for i in 1:length(parents)
-    @inbounds parents[i]=Array{Int64}(0)
-  end
-
-  p = Stack(UInt64)
-  push!(p, s)
-  while !isempty(p)
-    u = pop!(p)
-    println("pop: $u") 
-    if tag[u]==0
-      tag[u]=1
-      println("Untagged $u")
-      for i in G[u]
-        println("neighbours $i") 
-        push!(p,i)
-        if tag[i]==0
-          push!(parents[u], i)
-        end
-      end
-    end
-  end
-
-  return parents,tag
-end
-
-function fast_bfs(G::Array{Array{Int64},1} ;s=1)
-"""
-"""
-  l = length(G)
-  tag = zeros(UInt8,l)
-    
-  q = Queue(UInt64)
-  tag[s] = 1
-  enqueue!(q, s)
-  while !isempty(q)
-    u = dequeue!(q)
-    @inbounds for i in G[u]
-      @inbounds if tag[i]==0
-        @inbounds tag[i]=1
-        enqueue!(q,i)
-      end
-    end
-  end
 end
