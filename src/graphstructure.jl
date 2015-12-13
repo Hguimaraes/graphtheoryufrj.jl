@@ -54,7 +54,7 @@ type simpleGraph
     		end
 
     		# Fill the Adjacency List
-			@time @inbounds for i in lines
+			@inbounds for i in lines
 				vertex = parse(Int64,split(i)[1])
 				edge = parse(Int64,split(i)[2])
 				push!(this.Graph[vertex], edge)
@@ -68,7 +68,7 @@ type simpleGraph
 		"""
 			# Pre-allocate the structure and initialize with zeros
 			this.Graph = zeros(UInt8, this.num_vertex, this.num_vertex)
-			@time @inbounds for i in lines
+			@inbounds for i in lines
 				rnum = parse(Int64,split(i)[1])
 				cnum = parse(Int64,split(i)[2])
 				this.Graph[rnum, cnum] = 1
