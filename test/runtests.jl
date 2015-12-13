@@ -2,7 +2,7 @@ using graphtheoryufrj
 using Base.Test
 
 include("ratton_first_assignment.jl")
-FLAG_RATTON_ASSIGNMENT01 = false
+FLAG_RATTON_ASSIGNMENT01 = true
 
 if FLAG_RATTON_ASSIGNMENT01
 	# Test the memory representation of the structures of the Graph
