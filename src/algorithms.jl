@@ -272,3 +272,51 @@ function connected_components(G::Array{Array{Int64},1})
 
   return size_cc
 end
+
+function dia_bfs(G::Array{Array{Int64},1}; s = 1)
+"""
+"""
+  l = length(G)
+  tag = zeros(UInt8,l)
+  layer = Array{Int64}(l)
+
+  fill!(layer,-1)
+
+  q = Queue(UInt64)
+  tag[s] = 1
+  layer[s] = 0
+  enqueue!(q, s)
+  while !isempty(q)
+    u = dequeue!(q)
+    @inbounds for i in G[u]
+      @inbounds if tag[i] == 0
+        @inbounds tag[i] = 1
+
+        if layer[i] == -1
+          layer[i] = layer[u] + 1
+        end
+        
+        enqueue!(q,i)
+              
+      end
+    end
+  end
+
+  return layer
+end
+
+function diameter(G::Array{Array{Int64},1}, limit)
+"""
+"""
+max = 0
+@simd for i in 1:limit
+  layer = dia_bfs(G, s=i)
+  m = maximum(layer)
+  if m > max
+    max = m
+  end
+end
+
+print(max)
+return max
+end
