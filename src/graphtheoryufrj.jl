@@ -16,6 +16,9 @@ export
 	bfs,
 	fast_bfs,
 	dfs,
+	connected_components,
+	show_cycle,
+	has_cycle,
 
 	# Plot data
 	plot_graph,

@@ -236,3 +236,34 @@ function show_cycle(layer)
   end
   return parents
 end
+
+function connected_components(G::Array{Array{Int64},1})
+"""
+"""
+  l, p, t = bfs(G, s = 1)
+  num_cc = 1
+  size_cc = Queue(UInt64)
+
+  s = 0
+  for i in 1:length(t)
+    if t[i] == 1
+      s += 1
+    end
+  end
+  enqueue!(size_cc, s)
+
+  while findfirst(t, 0) != 0
+    l_tmp, p_tmp, t_tmp = bfs(G, s = t[id])
+
+    s = 0
+    for i in 1:length(t_tmp)
+      if t_tmp[i] == 1
+        s += 1
+      end
+    end
+    enqueue!(size_cc, s)
+    t = broadcast(|, t, t_tmp)
+  end
+
+  return size_cc
+end
