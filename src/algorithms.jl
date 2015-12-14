@@ -253,7 +253,7 @@ function connected_components(G::Array{Array{Int64},1})
   enqueue!(size_cc, s)
 
   while findfirst(t, 0) != 0
-    l_tmp, p_tmp, t_tmp = bfs(G, s = t[id])
+    l_tmp, p_tmp, t_tmp = bfs(G, s = findfirst(t, 0))
 
     s = 0
     for i in 1:length(t_tmp)

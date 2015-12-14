@@ -1,4 +1,5 @@
 using graphtheoryufrj
+using DataStructures
 
 """
 Requirement (PT-BR): Compare o desempenho em termos de quantidade de memoria
@@ -156,6 +157,17 @@ componentes conexas tem o grafo? Qual e o tamanho da maior e da menor
 componente conexo?
 """
 function test_five(infile_name::ASCIIString)
+	println("- Starting the Test Five")
+	try
+		println("\n-- Performing the connected components algorithm: ")
+		graph_list = simpleGraph(infile_name)
+		@time connected_comp = connected_components(graph_list.G)
+		println("Number of connected components: ", length(connected_comp))
+		println("Largest connected components size : ")
+		println("Smallest connected components size: ")
+	catch
+		error("Error in \"test_five\" function.")
+	end
 	return "TEST_FIVE_SUCESS"
 end
 
