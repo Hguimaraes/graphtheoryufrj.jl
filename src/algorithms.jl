@@ -93,12 +93,17 @@ function dfs(G::Array{Array{Int64},1}; s = 1)
   push!(p, s)
   while !isempty(p)
     u = pop!(p)
-    if tag[u] == 0
-      tag[u] = 1
+    print("exploring! $u \n")
+    if tag[u] <= 1
+      tag[u] = 2
       for i in G[u]
+        print("neighbour $i \n")
         push!(p,i)
         if tag[i] == 0
+          print("discovered $i \n")
           push!(parents[u], i)
+          tag[i] = 1
+
         end
       end
     end
