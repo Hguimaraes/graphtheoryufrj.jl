@@ -29,10 +29,9 @@ function bfs(G::Array{Array{Int64},1}; s = 1)
         if layer[i] == -1
           layer[i] = layer[u] + 1
         end
-        
+
         @inbounds push!(parents[u], i)
         enqueue!(q,i)
-              
       end
     end
   end
@@ -48,7 +47,7 @@ function bfs(G::Array{UInt8,2}; s = 1)
   tag = zeros(UInt8,l)
   parents = Array{Array{Int64,1}}(l)
   layer = Array{Int64}(l)
-  
+
   fill!(layer,-1)
 
   @simd for i in 1:length(parents)
@@ -68,7 +67,7 @@ function bfs(G::Array{UInt8,2}; s = 1)
         if layer[i] == -1
           layer[i] = layer[u] + 1
         end
-        
+
         @inbounds push!(parents[u],i)
         enqueue!(q,i)
       end
@@ -93,14 +92,11 @@ function dfs(G::Array{Array{Int64},1}; s = 1)
   push!(p, s)
   while !isempty(p)
     u = pop!(p)
-    print("exploring! $u \n")
     if tag[u] <= 1
       tag[u] = 2
       for i in G[u]
-        print("neighbour $i \n")
         push!(p,i)
         if tag[i] == 0
-          print("discovered $i \n")
           push!(parents[u], i)
           tag[i] = 1
 
@@ -149,7 +145,7 @@ function fast_bfs(G::Array{Array{Int64},1}; s = 1)
 """
   l = length(G)
   tag = zeros(UInt8,l)
-    
+
   q = Queue(UInt64)
   tag[s] = 1
   enqueue!(q, s)
@@ -170,7 +166,7 @@ function fast_bfs(G::Array{UInt8,2}; s = 1)
   x_dim, y_dim = size(G)
   l = x_dim
   tag = zeros(UInt8,l)
-    
+
   q = Queue(UInt64)
   tag[s] = 1
   enqueue!(q, s)
@@ -190,7 +186,7 @@ function has_cycle(G::Array{Array{Int64},1}; s = 1)
 """
   l = length(G)
   layer = Array{Int64}(l)
-    
+
   q = Queue(UInt64)
 
   for i in 1:length(layer)
@@ -210,7 +206,7 @@ function has_cycle(G::Array{Array{Int64},1}; s = 1)
         println("Deq $u")
         println("Layer[u] is ", layer[u] )
         for z in G[u]
-          println("z = $z") 
+          println("z = $z")
           println("Layer of z ", layer[z])
           if layer[z] == -1
             layer[z] = layer[u]+1
@@ -223,7 +219,7 @@ function has_cycle(G::Array{Array{Int64},1}; s = 1)
         end
         println("_______________")
       end
-    end 
+    end
   end
 
   return false
@@ -247,7 +243,7 @@ function connected_components(G::Array{Array{Int64},1})
 """
   l, p, t = bfs(G, s = 1)
   num_cc = 1
-  size_cc = Queue(UInt64)
+  size_cc = []
 
   s = 0
   for i in 1:length(t)
@@ -255,7 +251,7 @@ function connected_components(G::Array{Array{Int64},1})
       s += 1
     end
   end
-  enqueue!(size_cc, s)
+  push!(size_cc, s)
 
   while findfirst(t, 0) != 0
     l_tmp, p_tmp, t_tmp = bfs(G, s = findfirst(t, 0))
@@ -266,7 +262,7 @@ function connected_components(G::Array{Array{Int64},1})
         s += 1
       end
     end
-    enqueue!(size_cc, s)
+    push!(size_cc, s)
     t = broadcast(|, t, t_tmp)
   end
 
@@ -295,9 +291,9 @@ function dia_bfs(G::Array{Array{Int64},1}; s = 1)
         if layer[i] == -1
           layer[i] = layer[u] + 1
         end
-        
+
         enqueue!(q,i)
-              
+
       end
     end
   end
@@ -308,15 +304,14 @@ end
 function diameter(G::Array{Array{Int64},1}, limit)
 """
 """
-max = 0
-@simd for i in 1:limit
-  layer = dia_bfs(G, s=i)
-  m = maximum(layer)
-  if m > max
-    max = m
+  max = 0
+  @simd for i in 1:limit
+    layer = dia_bfs(G, s=i)
+    m = maximum(layer)
+    if m > max
+      max = m
+    end
   end
-end
 
-print(max)
-return max
+  return max
 end

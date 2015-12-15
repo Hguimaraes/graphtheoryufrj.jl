@@ -82,8 +82,8 @@ function test_three(infile_name::ASCIIString, initial_vertex)
 end
 
 """
-Requirement (PT-BR): Determine o pai dos vertices 10, 20, 30, 40, 50 na 
-arvore geradora induzida pela BFS e pela DFS quando iniciamos a busca nos 
+Requirement (PT-BR): Determine o pai dos vertices 10, 20, 30, 40, 50 na
+arvore geradora induzida pela BFS e pela DFS quando iniciamos a busca nos
 vertices 1, 2, 3, 4, 5.
 """
 function test_four(infile_name::ASCIIString, outfile_name::ASCIIString)
@@ -93,11 +93,11 @@ function test_four(infile_name::ASCIIString, outfile_name::ASCIIString)
 	try
 		initial_vertex = [1 2 3 4 5]
 		child = [10 20 30 40 50]
-		
+
 		println("\n-- Performing the BFS on the Adjacency List: ")
 		graph_list = simpleGraph(infile_name)
 		fathers = Array{Array{Int64},1}(length(child))
-		
+
 		# Initialize fathers with zeros
 		@inbounds @simd for i in 1:length(child)
    	 		fathers[i] = Array{Int64}(0)
@@ -158,16 +158,16 @@ componente conexo?
 """
 function test_five(infile_name::ASCIIString)
 	println("- Starting the Test Five")
-	try
+	#try
 		println("\n-- Performing the connected components algorithm: ")
 		graph_list = simpleGraph(infile_name)
-		@time connected_comp = connected_components(graph_list.G)
+		@time connected_comp = connected_components(graph_list.Graph)
 		println("Number of connected components: ", length(connected_comp))
-		println("Largest connected components size : ")
-		println("Smallest connected components size: ")
-	catch
-		error("Error in \"test_five\" function.")
-	end
+		println("Largest connected components size : ", maximum(connected_comp))
+		println("Smallest connected components size: ", minimum(connected_comp))
+	# catch
+	# 	error("Error in \"test_five\" function.")
+	# end
 	return "TEST_FIVE_SUCESS"
 end
 
@@ -182,15 +182,20 @@ function test_six(infile_name::ASCIIString)
 		graph_list = simpleGraph(infile_name)
 		println("-- Performing mean_degree and empirical_dist on Adjacency List")
 		@time mean_degree, empirical_dist = graph_properties(graph_list)
-		
-		largest_degree = maximum(empirical_dist) * graph_list.num_vertex
-		println("--- Largest degree on the Graph = ", largest_degree)
 
-		smallest_degree = minimum(empirical_dist) * graph_list.num_vertex
+		largest_degree = 0
+		smallest_degree = graph_list.num_edge
+
+		for i in 1:length(graph_list.Graph)
+			x = length(graph_list.Graph[i])
+			largest_degree =  (largest_degree < x) ? x : largest_degree
+			smallest_degree = (smallest_degree > x) ? x : smallest_degree
+		end
+
+		println("--- Largest degree on the Graph = ", largest_degree)
 		println("--- Smallest degree on the Graph = ", smallest_degree)
 	catch
-		error("""Error in \"test_six\" function calculating the empirical
-		distribution on the as_graph file.""")
+		error("""Error in \"test_six\" function.""")
 	end
 	return "TEST_SIX_SUCESS"
 end
@@ -202,5 +207,14 @@ do maior caminho minimo do grafo). Determine tambem o tempo de execucao necessar
 para calcular o diametro.
 """
 function test_seven(infile_name::ASCIIString)
+	println("\n- Starting the Test Six")
+	try
+		graph_list = simpleGraph(infile_name)
+		println("-- Performing mean_degree and empirical_dist on Adjacency List")
+		@time max_diam = diameter(graph_list.Graph, graph_list.num_edge)
+		println("Maximum diameter = ", max_diam)
+	catch
+		error("""Error in \"test_seven\" function.""")
+	end
 	return "TEST_SEVEN_SUCESS"
 end

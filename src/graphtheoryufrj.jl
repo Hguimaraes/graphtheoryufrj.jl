@@ -19,6 +19,8 @@ export
 	connected_components,
 	show_cycle,
 	has_cycle,
+	dia_bfs,
+	diameter,
 
 	# Plot data
 	plot_graph,
