@@ -13,9 +13,10 @@ type simpleGraph
 	# Properties of the Graph
 	num_vertex::Int64
 	num_edge::Int64
-	Graph::Union{Array{Array{Int64},1}, Array{UInt8,2}}
+	Graph::Union{Array{Array{Int64},1}, Array{UInt8,2}, Array{Array{Array{Int64}}}}
 	make_report::Function
 	format_graph::ASCIIString
+	weighted::Bool
 
 	function simpleGraph(filename::ASCIIString, format::ASCIIString = "adjlist")
 	"""
@@ -37,6 +38,13 @@ type simpleGraph
 
 		lines = readlines(infile)
 		this.num_edge = size(lines)[1]
+
+		this.weighted = false
+		if length(split(lines[2])) == 3
+			this.weighted = true
+		end
+
+
 		this.format_graph = format
 
 		# Return the selected structure
@@ -45,21 +53,56 @@ type simpleGraph
 		@brief: With this flag you can take the graph abstraction and transform
 			into an Adjacency List.
 		"""
-			# Pre-allocate the structure
-			this.Graph = Array{Array{Int64}}(this.num_vertex)
-			
-			# Initialize with Zeros
-			@inbounds @simd for i in 1:this.num_vertex
-   	 			this.Graph[i] = Array{Int64}(0)
-    		end
+			if this.weighted == false
+				# Pre-allocate the structure
+				this.Graph = Array{Array{Int64}}(this.num_vertex)
+				
+				# Initialize with Zeros
+				@inbounds @simd for i in 1:this.num_vertex
+	   	 			this.Graph[i] = Array{Int64}(0)
+	    		end
 
-    		# Fill the Adjacency List
-			@inbounds for i in lines
-				vertex = parse(Int64,split(i)[1])
-				edge = parse(Int64,split(i)[2])
-				push!(this.Graph[vertex], edge)
-				push!(this.Graph[edge], vertex)
+	    		# Fill the Adjacency List
+				@inbounds for i in lines
+					vertex = parse(Int64,split(i)[1])
+					edge = parse(Int64,split(i)[2])
+					push!(this.Graph[vertex], edge)
+					push!(this.Graph[edge], vertex)
+				end
+			
+
+			else
+
+				# Pre-allocate the structure
+				this.Graph = Array{Array{Array{Int64}}}(this.num_vertex)
+				
+				# Initialize with Zeros
+				@inbounds @simd for i in 1:this.num_vertex
+	   	 			this.Graph[i] = Array[Int[],Float64[]]
+	    		end
+
+	    		# Fill the Adjacency List
+				@inbounds for i in lines
+					vertex = parse(Int64,split(i)[1])
+					edge = parse(Int64,split(i)[2])
+					weight = parse(Float64,split(i)[3])
+					push!(this.Graph[vertex][1], edge)
+					push!(this.Graph[edge][1], vertex)
+					push!(this.Graph[vertex][2], weight)
+					push!(this.Graph[edge][2], weight)
+				end
 			end
+
+
+
+
+
+		
+
+		
+	
+
+
 
 		elseif format == "adjmatrix"
 		"""
