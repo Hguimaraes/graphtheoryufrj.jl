@@ -315,3 +315,39 @@ function diameter(G::Array{Array{Int64},1}, limit)
 
   return max
 end
+
+function dikjstra(G, s)
+
+	l = length(G)
+	pq = Collections.PriorityQueue()
+
+	prev = Array{Int64}(l)
+  	
+  	dist = Array{Int64}(l)
+  	fill!(dist, 10000000)
+  	fill!(prev, -1)
+
+  	dist[s] = 0
+
+
+  	for i in 1:l
+  		pq[i] = dist[i]
+  	end
+
+  	while !isempty(pq)
+  		u = Collections.dequeue!(pq)
+  		for k in 1:length(G[u][1])
+  			alt = dist[u] + G[u][2][k]
+
+  			v = G[u][1][k]
+  			if alt < dist[v]
+  				dist[v] = alt
+  				prev[v] = u
+  				pq[v] = alt
+  			end
+
+
+  		end
+  	end
+  	return dist, prev
+end
