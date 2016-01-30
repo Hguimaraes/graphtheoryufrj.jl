@@ -329,7 +329,6 @@ function dikjstra(G, s)
 
   	dist[s] = 0
 
-
   	for i in 1:l
   		pq[i] = dist[i]
   	end
@@ -339,8 +338,95 @@ function dikjstra(G, s)
   		for k in 1:length(G[u][1])
   			alt = dist[u] + G[u][2][k]
 
+
   			v = G[u][1][k]
   			if alt < dist[v]
+  				dist[v] = alt
+  				prev[v] = u
+  				pq[v] = alt
+  			end
+
+
+  		end
+  	end
+  	return dist, prev
+end
+
+function mean_distance(G)
+
+	l = length(G)
+	M = 0
+	N = 0
+	for i in 1:l
+		d,_ = dikjstra(G,i)
+		for j in d
+			if j<10000000
+				M+=j
+				N+=1
+			end
+		end
+		
+	end
+
+	return M/N
+end
+
+function floydw(G)
+
+	l = length(G)
+	V = fill(1000000, l, l)
+
+	for i in 1:l
+		V[i][i] = 0
+	end
+
+	for i in 1:l
+		u = i
+		for k in length(G[u][1])
+			v = G[u][1][k]
+			V[u][v] = G[u][2][k]
+		end
+	end
+
+	for i in 1:l
+		for j in 1:l
+			for k in 1:l
+				if V[i][j] > V[i][k] + V[k][j]
+					V[i][j] = V[i][k] + V[k][j]
+				end
+			end
+		end
+	end
+
+	return V
+end
+
+function prim(G, s)
+
+	l = length(G)
+	pq = Collections.PriorityQueue()
+
+	prev = Array{Int64}(l)
+  	
+  	dist = Array{Int64}(l)
+  	fill!(dist, 10000000)
+  	fill!(prev, -1)
+
+  	dist[s] = 0
+
+
+
+  	for i in 1:l
+  		pq[i] = dist[i]
+  	end
+
+  	while !isempty(pq)
+  		u = Collections.dequeue!(pq)
+  		for k in 1:length(G[u][1])
+  			alt = G[u][2][k]
+
+  			v = G[u][1][k]
+  			if haskey(p,v) && alt < dist[v]
   				dist[v] = alt
   				prev[v] = u
   				pq[v] = alt
