@@ -16,7 +16,7 @@ type simpleGraph
 	Graph::Union{Array{Array{Int64},1}, Array{UInt8,2}, Array{Array{Array{Int64}}}}
 	make_report::Function
 	format_graph::ASCIIString
-	weighted::Bool
+	is_weighted::Bool
 
 	function simpleGraph(filename::ASCIIString, format::ASCIIString = "adjlist")
 	"""
@@ -39,9 +39,9 @@ type simpleGraph
 		lines = readlines(infile)
 		this.num_edge = size(lines)[1]
 
-		this.weighted = false
+		this.is_weighted = false
 		if length(split(lines[2])) == 3
-			this.weighted = true
+			this.is_weighted = true
 		end
 
 
@@ -53,7 +53,7 @@ type simpleGraph
 		@brief: With this flag you can take the graph abstraction and transform
 			into an Adjacency List.
 		"""
-			if this.weighted == false
+			if !this.is_weighted
 				# Pre-allocate the structure
 				this.Graph = Array{Array{Int64}}(this.num_vertex)
 				
@@ -69,10 +69,8 @@ type simpleGraph
 					push!(this.Graph[vertex], edge)
 					push!(this.Graph[edge], vertex)
 				end
-			
 
 			else
-
 				# Pre-allocate the structure
 				this.Graph = Array{Array{Array{Int64}}}(this.num_vertex)
 				
@@ -86,36 +84,41 @@ type simpleGraph
 					vertex = parse(Int64,split(i)[1])
 					edge = parse(Int64,split(i)[2])
 					weight = parse(Float64,split(i)[3])
+					
 					push!(this.Graph[vertex][1], edge)
 					push!(this.Graph[edge][1], vertex)
+					
 					push!(this.Graph[vertex][2], weight)
 					push!(this.Graph[edge][2], weight)
 				end
 			end
-
-
-
-
-
-		
-
-		
-	
-
-
 
 		elseif format == "adjmatrix"
 		"""
 		@brief: With this flag you can take the graph abstraction and transform
 			into an Adjacency Matrix.
 		"""
-			# Pre-allocate the structure and initialize with zeros
-			this.Graph = zeros(UInt8, this.num_vertex, this.num_vertex)
-			@inbounds for i in lines
-				rnum = parse(Int64,split(i)[1])
-				cnum = parse(Int64,split(i)[2])
-				this.Graph[rnum, cnum] = 1
-				this.Graph[cnum, rnum] = 1
+			if !this.is_weighted
+				# Pre-allocate the structure and initialize with zeros
+				this.Graph = zeros(UInt8, this.num_vertex, this.num_vertex)
+				
+				@inbounds for i in lines
+					rnum = parse(Int64,split(i)[1])
+					cnum = parse(Int64,split(i)[2])
+					this.Graph[rnum, cnum] = 1
+					this.Graph[cnum, rnum] = 1
+				end
+			else
+				# Pre-allocate the structure and initialize with zeros
+				this.Graph = zeros(Float64, this.num_vertex, this.num_vertex)
+				
+				@inbounds for i in lines
+					rnum = parse(Int64,split(i)[1])
+					cnum = parse(Int64,split(i)[2])
+					weight = parse(Float64,split(i)[3])
+					this.Graph[rnum, cnum] = weight
+					this.Graph[cnum, rnum] = weight
+				end
 			end
 		else
 			error(""" Invalid format selected, options are:\n
@@ -152,13 +155,6 @@ type simpleGraph
 
 		close(infile)
 		return this
-	end
-end
-
-#@TODO : Implement a class to generate graph examples.
-type demoGraph
-	function demoGraph()
-		println("Inside the Class Demo Graph")
 	end
 end
 

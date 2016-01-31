@@ -9,7 +9,6 @@ using DataStructures, Compat
 export 
 	# Graph data structure
 	simpleGraph,
-	demoGraph,
 	graph_properties,
 	
 	# Algorithms
@@ -21,6 +20,10 @@ export
 	has_cycle,
 	dia_bfs,
 	diameter,
+	dikjstra,
+	mean_distance,
+	floydw,
+	prim,
 
 	# Plot data
 	plot_graph,
