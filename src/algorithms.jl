@@ -316,7 +316,7 @@ function diameter(G::Array{Array{Int64},1}, limit)
   return max
 end
 
-function dikjstra(G, s)
+function dijkstra(G, s)
 
 	l = length(G)
 	pq = Collections.PriorityQueue()
@@ -388,20 +388,17 @@ function floydw(G)
 		end
 	end
 
-	for i in 1:l
-		for j in 1:l
-			for k in 1:l
-				if V[i][j] > V[i][k] + V[k][j]
-					V[i][j] = V[i][k] + V[k][j]
-				end
-			end
-		end
-	end
-
+  for k = 1:n, i = 1:n, j = 1:n
+    d = V[i][k] + V[k][j]
+    if d < V[i][j]
+      V[i][j] = d
+    end
+  end
+	
 	return V
 end
 
-function prim(G, s)
+function prim_mst(G, s)
 
 	l = length(G)
 	pq = Collections.PriorityQueue()
