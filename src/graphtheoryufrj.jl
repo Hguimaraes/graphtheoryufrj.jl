@@ -20,10 +20,10 @@ export
 	has_cycle,
 	dia_bfs,
 	diameter,
-	dikjstra,
+	dijkstra,
 	mean_distance,
 	floydw,
-	prim,
+	prim_mst,
 
 	# Plot data
 	plot_graph,
