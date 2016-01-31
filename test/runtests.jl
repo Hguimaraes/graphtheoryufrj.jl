@@ -2,6 +2,7 @@ using graphtheoryufrj
 using Base.Test
 
 include("ratton_first_assignment.jl")
+include("ratton_second_assignment.jl")
 
 FLAG_RATTON_ASSIGNMENT01 = false
 infile_name = "../assets/as_graph.txt"
@@ -29,4 +30,24 @@ if FLAG_RATTON_ASSIGNMENT01
 
 	#
 	@test test_seven(infile_name) == "TEST_SEVEN_SUCESS"
+end
+
+FLAG_RATTON_ASSIGNMENT02 = false
+infile_name = ""
+
+if FLAG_RATTON_ASSIGNMENT02
+	#
+	@test test_one(infile_name) == "TEST_ONE_SUCESS"
+
+	#
+	@test test_two(infile_name, initial_vertex) == "TEST_TWO_SUCESS"
+
+	#
+	@test test_three(infile_name, initial_vertex) == "TEST_THREE_SUCESS"
+
+	#
+	@test test_four() == "TEST_COLAB_ONE_SUCESS"
+
+	#
+	@test test_four() == "TEST_COLAB_TWO_SUCESS"
 end
