@@ -9,19 +9,19 @@ e um caminho minimo entre os vertices de origem e o vertice 1.
 """
 function test_one(infile_name::ASCIIString)
 	println("- Starting the Test One")
-	try
+	#try
 		initial_vertex = [10 20 30 40 50]
 		
-		println("\n-- Performing the Dijkstra on the Adjacency List: ")
+		println("\n-- Performing 5 Dijkstras on the Adjacency List: ")
 		graph_list = simpleGraph(infile_name)
 		
-		# Do the Dijkstra to find the parents and fill
+		# Do the Dijkstra to find the shortest path
 		@time for i in initial_vertex
-			dist, prev = dijkstra(graph_list.Graph, s = i)
+			dist, prev = dijkstra(graph_list.Graph, i)
 		end
-	catch
-		error("Error in \"test_one\" function.")
-	end
+	#catch
+	#	error("Error in \"test_one\" function.")
+	#end
 	return "TEST_ONE_SUCESS"
 end
 
@@ -29,12 +29,12 @@ end
 Requirement (PT-BR): Obtenha uma arvore geradora minima, informando seu peso.
 Obtenha o tempo de execucao para resolver este problema.
 """
-function test_two(infile_name::ASCIIString, algorithm::function, initial_vertex = 10)
+function test_two(infile_name::ASCIIString, algorithm::Function, initial_vertex)
 	println("- Starting the Test Two")
 	try
 		println("\n-- Performing the algorithm to obtain the MST")
 		graph_list = simpleGraph(infile_name)
-		@time dist, prev = algorithm(graph_list.Graph, s = initial_vertex)
+		@time dist, prev = algorithm(graph_list.Graph, initial_vertex)
 	catch
 		error("Error in \"test_two\" function.")
 	end
@@ -58,12 +58,17 @@ function test_three(infile_name::ASCIIString)
 end
 
 """
-Requirement (PT-BR): Calcule a distancia e o caminho minimo entre Edsger W. 
+Requirement (PT-BR): Calcule a distancia e o caminho minimo entre Edsger W.
 Dijkstra (o pesquisador) e os seguintes pesquisadores na rede de colaboracao:
 Alan M. Turing, J. B. Kruskal, Jon M. Kleinberg, Eva Tardos, Daniel R. Figueiredo.
 """
 function test_colab_one()
 	println("- Starting the Test One of the colaboration network")
+	try
+		
+	catch
+		error("Error in \"test_colab_one\" function.")
+	end
 	return "TEST_COLAB_ONE_SUCESS"
 end
 
@@ -75,5 +80,10 @@ seguintes perguntas:
 """
 function test_colab_two()
 	println("- Starting the Test Two of the colaboration network")
+	try
+
+	catch
+		error("Error in \"test_colab_two\" function.")
+	end
 	return "TEST_COLAB_TWO_SUCESS"
 end

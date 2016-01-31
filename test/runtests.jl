@@ -33,21 +33,21 @@ if FLAG_RATTON_ASSIGNMENT01
 end
 
 FLAG_RATTON_ASSIGNMENT02 = false
-infile_name = ""
+infile_name = "../assets/grafo_1.txt"
 
 if FLAG_RATTON_ASSIGNMENT02
 	#
 	@test test_one(infile_name) == "TEST_ONE_SUCESS"
 
 	#
-	@test test_two(infile_name, initial_vertex) == "TEST_TWO_SUCESS"
+	#@test test_two(infile_name, initial_vertex) == "TEST_TWO_SUCESS"
 
 	#
-	@test test_three(infile_name, initial_vertex) == "TEST_THREE_SUCESS"
+	#@test test_three(infile_name, initial_vertex) == "TEST_THREE_SUCESS"
 
 	#
-	@test test_four() == "TEST_COLAB_ONE_SUCESS"
+	#@test test_four() == "TEST_COLAB_ONE_SUCESS"
 
 	#
-	@test test_four() == "TEST_COLAB_TWO_SUCESS"
+	#@test test_four() == "TEST_COLAB_TWO_SUCESS"
 end
