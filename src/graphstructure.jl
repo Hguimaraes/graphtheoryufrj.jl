@@ -28,7 +28,7 @@ type simpleGraph
 		information. This function expect an ASCIIString.
 	@param format::ASCIIString Option for specify the type of representation
 		for the graph. Options are: 'adjlist' or 'adjmatrix'.
-	"""	
+	"""
 		# Instantiate the Class
 		this = new()
 
@@ -56,7 +56,7 @@ type simpleGraph
 			if !this.is_weighted
 				# Pre-allocate the structure
 				this.Graph = Array{Array{Int64}}(this.num_vertex)
-				
+
 				# Initialize with Zeros
 				@inbounds @simd for i in 1:this.num_vertex
 	   	 			this.Graph[i] = Array{Int64}(0)
@@ -73,7 +73,7 @@ type simpleGraph
 			else
 				# Pre-allocate the structure
 				this.Graph = Array{Array{Array{Int64}}}(this.num_vertex)
-				
+
 				# Initialize with Zeros
 				@inbounds @simd for i in 1:this.num_vertex
 	   	 			this.Graph[i] = Array[Int[],Float64[]]
@@ -84,10 +84,11 @@ type simpleGraph
 					vertex = parse(Int64,split(i)[1])
 					edge = parse(Int64,split(i)[2])
 					weight = parse(Float64,split(i)[3])
-					
+					println(typeof(weight))
+
 					push!(this.Graph[vertex][1], edge)
 					push!(this.Graph[edge][1], vertex)
-					
+
 					push!(this.Graph[vertex][2], weight)
 					push!(this.Graph[edge][2], weight)
 				end
@@ -101,7 +102,7 @@ type simpleGraph
 			if !this.is_weighted
 				# Pre-allocate the structure and initialize with zeros
 				this.Graph = zeros(UInt8, this.num_vertex, this.num_vertex)
-				
+
 				@inbounds for i in lines
 					rnum = parse(Int64,split(i)[1])
 					cnum = parse(Int64,split(i)[2])
@@ -111,7 +112,7 @@ type simpleGraph
 			else
 				# Pre-allocate the structure and initialize with zeros
 				this.Graph = zeros(Float64, this.num_vertex, this.num_vertex)
-				
+
 				@inbounds for i in lines
 					rnum = parse(Int64,split(i)[1])
 					cnum = parse(Int64,split(i)[2])
@@ -126,13 +127,13 @@ type simpleGraph
 				* adjmatrix\n
 				Example: graph = simpleGraph(\"mygraph.txt\", \"adjmatrix\")""")
 		end
-		
+
 		this.make_report = function(outfilename::ASCIIString)
 		"""
 		@brief: Method to make a small report with usefull informations
 			about the graph.
 		@param outfilename String with the name of the report filename
-			in the ASCIIString format. 
+			in the ASCIIString format.
 		"""
 			# Get the mean degree and the empirical distance.
 			mean_degree, empirical_dist = graph_properties(this)
@@ -170,9 +171,9 @@ function graph_properties(G::simpleGraph)
 		if degree != 0
 			sum += degree
 			empirical_dist[degree] += 1
-		end	
+		end
 	end
-	
+
 	mean_degree = (sum/G.num_edge)
 	empirical_dist /= G.num_vertex
 	return mean_degree, empirical_dist

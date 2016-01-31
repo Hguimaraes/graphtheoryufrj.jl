@@ -2,6 +2,11 @@
 # Authors : Heitor Guimaraes and Luiz Ciafrino
 # @brief: Module with some algorithms for graphs
 
+# Constants
+let
+  global infinite = 100000000
+end
+
 function bfs(G::Array{Array{Int64},1}; s = 1)
 """
 """
@@ -316,15 +321,16 @@ function diameter(G::Array{Array{Int64},1}, limit)
   return max
 end
 
-function dijkstra(G, s)
-
+function dijkstra(G, s, infinite_weight = infinite)
+"""
+"""
 	l = length(G)
 	pq = Collections.PriorityQueue()
 
 	prev = Array{Int64}(l)
-  	
+
   	dist = Array{Int64}(l)
-  	fill!(dist, 10000000)
+  	fill!(dist, infinite_weight)
   	fill!(prev, -1)
 
   	dist[s] = 0
@@ -352,85 +358,115 @@ function dijkstra(G, s)
   	return dist, prev
 end
 
-function mean_distance(G)
 
+function floydw(G, infinite_weight = infinite)
+"""
+"""
 	l = length(G)
-	M = 0
-	N = 0
-	for i in 1:l
-		d,_ = dikjstra(G,i)
-		for j in d
-			if j<10000000
-				M+=j
-				N+=1
-			end
-		end
-		
-	end
-
-	return M/N
-end
-
-function floydw(G)
-
-	l = length(G)
-	V = fill(1000000, l, l)
+	V = fill(infinite_weight, l, l)
 
 	for i in 1:l
-		V[i][i] = 0
+		V[i,i] = 0
 	end
 
 	for i in 1:l
 		u = i
 		for k in length(G[u][1])
 			v = G[u][1][k]
-			V[u][v] = G[u][2][k]
+      V[u,v] = G[u][2][k]
 		end
 	end
 
-  for k = 1:n, i = 1:n, j = 1:n
-    d = V[i][k] + V[k][j]
-    if d < V[i][j]
-      V[i][j] = d
+  for k = 1:l, i = 1:l, j = 1:l
+    d = V[i,k] + V[k,j]
+    if d < V[i,j]
+      V[i,j] = d
     end
   end
-	
 	return V
 end
 
-function prim_mst(G, s)
-
+function prim_mst(G, s, infinite_weight = infinite)
+"""
+"""
 	l = length(G)
 	pq = Collections.PriorityQueue()
 
 	prev = Array{Int64}(l)
-  	
-  	dist = Array{Int64}(l)
-  	fill!(dist, 10000000)
-  	fill!(prev, -1)
+  dist = Array{Int64}(l)
 
-  	dist[s] = 0
+  fill!(dist, infinite_weight)
+	fill!(prev, -1)
 
+	dist[s] = 0
 
+  for i in 1:l
+    pq[i] = dist[i]
+  end
 
-  	for i in 1:l
-  		pq[i] = dist[i]
-  	end
+  while !isempty(pq)
+    u = Collections.dequeue!(pq)
 
-  	while !isempty(pq)
-  		u = Collections.dequeue!(pq)
-  		for k in 1:length(G[u][1])
-  			alt = G[u][2][k]
+    for k in 1:length(G[u][1])
+      alt = G[u][2][k]
+      v = G[u][1][k]
 
-  			v = G[u][1][k]
-  			if haskey(p,v) && alt < dist[v]
-  				dist[v] = alt
+      if haskey(pq,v) && alt < dist[v]
+  		    dist[v] = alt
   				prev[v] = u
   				pq[v] = alt
-  			end
-
-
   		end
-  	end
+    end
+  end
   	return dist, prev
+end
+
+function mean_distance_dijkstra(G, infinite_weight = infinite)
+"""
+"""
+  l = length(G)
+  M = 0
+  N = 0
+  for i in 1:l
+    d,_ = dijkstra(G,i)
+    for j in d
+      if j < infinite_weight
+        M += j
+        N += 1
+      end
+    end
+  end
+  return M/N
+end
+
+function mean_distance_fw(G, infinite_weight = infinite)
+"""
+"""
+  l = length(G)
+  V = fill(infinite_weight, l, l)
+  M = N = 0
+
+  for i in 1:l
+    V[i,i] = 0
+    for j in length(G[i][1])
+      v = G[i][1][j]
+      V[i,v] = G[i][2][j]
+    end
+  end
+
+  for k = 1:l, i = 1:l, j = 1:l
+    d = V[i,k] + V[k,j]
+    if d < V[i,j]
+      V[i,j] = d
+    end
+  end
+
+  for i in V
+    if i < infinite_weight
+      M += i
+      N += 1
+    end
+  end
+
+  return M/N
 end

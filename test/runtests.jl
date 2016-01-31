@@ -33,21 +33,31 @@ if FLAG_RATTON_ASSIGNMENT01
 end
 
 FLAG_RATTON_ASSIGNMENT02 = false
-infile_name = "../assets/grafo_1.txt"
+algorithm = prim_mst
+initial_vertex_mst = 20
+infile_name = ["../assets/grafo_1.txt",
+	"../assets/grafo_2.txt",
+	"../assets/grafo_3.txt",
+	"../assets/grafo_4.txt",
+	"../assets/grafo_5.txt"]
 
 if FLAG_RATTON_ASSIGNMENT02
-	#
-	@test test_one(infile_name) == "TEST_ONE_SUCESS"
+	for i in infile_name
+		#
+		#@test test_one(i) == "TEST_ONE_SUCESS"
+
+		#
+		#@test test_two(i, algorithm, initial_vertex_mst) == "TEST_TWO_SUCESS"
+
+		#
+		#@test test_three(i) == "TEST_THREE_SUCESS"
+
+	end
 
 	#
-	#@test test_two(infile_name, initial_vertex) == "TEST_TWO_SUCESS"
+	@test test_colab_one() == "TEST_COLAB_ONE_SUCESS"
 
 	#
-	#@test test_three(infile_name, initial_vertex) == "TEST_THREE_SUCESS"
+	#@test test_colab_two() == "TEST_COLAB_TWO_SUCESS"
 
-	#
-	#@test test_four() == "TEST_COLAB_ONE_SUCESS"
-
-	#
-	#@test test_four() == "TEST_COLAB_TWO_SUCESS"
 end

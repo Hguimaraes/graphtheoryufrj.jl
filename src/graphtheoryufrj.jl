@@ -6,11 +6,11 @@
 module graphtheoryufrj
 using DataStructures, Compat
 
-export 
+export
 	# Graph data structure
 	simpleGraph,
 	graph_properties,
-	
+
 	# Algorithms
 	bfs,
 	fast_bfs,
@@ -21,9 +21,10 @@ export
 	dia_bfs,
 	diameter,
 	dijkstra,
-	mean_distance,
 	floydw,
 	prim_mst,
+	mean_distance_dijkstra,
+	mean_distance_fw,
 
 	# Plot data
 	plot_graph,
