@@ -327,9 +327,9 @@ function dijkstra(G, s, infinite_weight = infinite)
 	l = length(G)
 	pq = Collections.PriorityQueue()
 
-	prev = Array{Int64}(l)
+	prev = Array{Float64}(l)
 
-  	dist = Array{Int64}(l)
+  	dist = Array{Float64}(l)
   	fill!(dist, infinite_weight)
   	fill!(prev, -1)
 
@@ -341,12 +341,14 @@ function dijkstra(G, s, infinite_weight = infinite)
 
   	while !isempty(pq)
   		u = Collections.dequeue!(pq)
-  		for k in 1:length(G[u][1])
+      u = convert(Int64, u)
+      for k in 1:length(G[u][1])
   			alt = dist[u] + G[u][2][k]
 
 
   			v = G[u][1][k]
-  			if alt < dist[v]
+        v = convert(Int64, v)
+        if alt < dist[v]
   				dist[v] = alt
   				prev[v] = u
   				pq[v] = alt

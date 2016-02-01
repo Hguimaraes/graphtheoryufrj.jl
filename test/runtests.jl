@@ -32,7 +32,7 @@ if FLAG_RATTON_ASSIGNMENT01
 	@test test_seven(infile_name) == "TEST_SEVEN_SUCESS"
 end
 
-FLAG_RATTON_ASSIGNMENT02 = false
+FLAG_RATTON_ASSIGNMENT02 = true
 algorithm = prim_mst
 initial_vertex_mst = 20
 infile_name = ["../assets/grafo_1.txt",
@@ -50,12 +50,12 @@ if FLAG_RATTON_ASSIGNMENT02
 		#@test test_two(i, algorithm, initial_vertex_mst) == "TEST_TWO_SUCESS"
 
 		#
-		#@test test_three(i) == "TEST_THREE_SUCESS"
+		@test test_three(i) == "TEST_THREE_SUCESS"
 
 	end
 
 	#
-	@test test_colab_one() == "TEST_COLAB_ONE_SUCESS"
+	#@test test_colab_one() == "TEST_COLAB_ONE_SUCESS"
 
 	#
 	#@test test_colab_two() == "TEST_COLAB_TWO_SUCESS"

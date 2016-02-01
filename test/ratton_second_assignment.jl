@@ -18,7 +18,7 @@ function test_one(infile_name::ASCIIString)
 		# Do the Dijkstra to find the shortest path
 		@time for i in initial_vertex
 			@time dist,_ = dijkstra(graph_list.Graph, i)
-			#println(dist[1])
+			println(dist[1])
 		end
 	catch
 		error("Error in \"test_one\" function.")
@@ -52,7 +52,7 @@ function test_three(infile_name::ASCIIString)
 	#try
 		println("\n-- Performing the mean_distance algorithm")
 		graph_list = simpleGraph(infile_name)
-		@time mean = mean_distance(graph_list.Graph)
+		@time mean = mean_distance_dijkstra(graph_list.Graph)
 		println("Mean distance: ", mean)
 	#catch
 	#	error("Error in \"test_three\" function.")
@@ -77,19 +77,44 @@ function test_colab_one()
 	println("- Starting the Test One of the colaboration network")
 	initial_vertex = 2722
 
-	#try
+	try
 		println("\n-- Performing the algorithm to obtain the MST")
 		graph_list = simpleGraph("../assets/rede_colaboracao.txt")
-		@time dist,_ = dijkstra(graph_list.Graph, initial_vertex)
+		@time dist, prev = dijkstra(graph_list.Graph, initial_vertex)
 		println("Dijkstra to Turing: ", dist[11365])
 		println("Dijkstra to Kruskal: ", dist[471365])
 		println("Dijkstra to Kleinberg: ", dist[5709])
 		println("Dijkstra to Eva Tardos: ", dist[11386])
 		println("Dijkstra to Ratton: ", dist[343930])
 
-	#catch
-	#	error("Error in \"test_colab_one\" function.")
-	#end
+		# Parents of Ratton
+		u = 343930
+		while(u != 2722)
+			println(u)
+			u = prev[u]
+		end
+
+		# 3 biggest degrees
+		# @TODO: Improve this shit - Too many workaround
+		for i in 1:length(dist)
+			if(dist[i] == 100000000)
+				dist[i] = 0
+			end
+		end
+
+		i = findmax(dist)
+		println("3 biggest degrees: ")
+		println(i)
+		dist[i[2]] = 0
+		i = findmax(dist)
+		println(i)
+		dist[i[2]] = 0
+		i = findmax(dist)
+		println(i)
+
+	catch
+		error("Error in \"test_colab_one\" function.")
+	end
 
 	return "TEST_COLAB_ONE_SUCESS"
 end

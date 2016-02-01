@@ -13,7 +13,7 @@ type simpleGraph
 	# Properties of the Graph
 	num_vertex::Int64
 	num_edge::Int64
-	Graph::Union{Array{Array{Int64},1}, Array{UInt8,2}, Array{Array{Array{Int64}}}}
+	Graph::Union{Array{Array{Int64},1}, Array{UInt8,2}, Array{Array{Array{Float64}}}}
 	make_report::Function
 	format_graph::ASCIIString
 	is_weighted::Bool
@@ -72,19 +72,18 @@ type simpleGraph
 
 			else
 				# Pre-allocate the structure
-				this.Graph = Array{Array{Array{Int64}}}(this.num_vertex)
+				this.Graph = Array{Array{Array{Float64}}}(this.num_vertex)
 
 				# Initialize with Zeros
 				@inbounds @simd for i in 1:this.num_vertex
-	   	 			this.Graph[i] = Array[Int[],Float64[]]
-	    		end
+	   	 		this.Graph[i] = Array[Int64[], Float64[]]
+	    	end
 
-	    		# Fill the Adjacency List
+	    	# Fill the Adjacency List
 				@inbounds for i in lines
-					vertex = parse(Int64,split(i)[1])
-					edge = parse(Int64,split(i)[2])
-					weight = parse(Float64,split(i)[3])
-					println(typeof(weight))
+					vertex = parse(Int64, split(i)[1])
+					edge = parse(Int64, split(i)[2])
+					weight = parse(Float64, split(i)[3])
 
 					push!(this.Graph[vertex][1], edge)
 					push!(this.Graph[edge][1], vertex)
