@@ -33,7 +33,7 @@ function gurobi_coloring(G::Array{Array{Int64},1}, E)
 	h = convert(Int, sum(coloring(G)))
 	println("Greedy heuristic $h")
 
-	m = Model(solver=GurobiSolver(TimeLimit = 3600, Method=0, MIPFocus=2, Cuts=3, MIPGap=0.03))
+	m = Model(solver=GurobiSolver(TimeLimit = 120, Method=0, MIPFocus=2, Cuts=3, MIPGap=0.03))
 
 	@defVar(m, x[1:n, 1:h], Bin)
 	@defVar(m, y[1:h], Bin)
@@ -75,12 +75,33 @@ function run(name)
 
 	obj,y,x = gurobi_coloring(G, E)
 	println("Objective value of $obj")
+	return obj,y,x
+end
+
+function colors(x::Array{Float64,2})
+	ret = Array{Int}(size(x)[1])
+	for i in 1:size(x)[1]
+		for j in 1:size(x)[2]
+			if x[i,j] == 1
+				ret[i]=j
+			end
+		end
+	end
+	ret2 = Array{Int}(size(x)[1])
+	c = 0
+	for i in Set(ret)
+		for j in find(ret .== i)
+			ret2[j] = c
+		end
+		c+=1
+	end
+	return ret, ret2
 end
 
 println("Compile run")
 run("g.txt")
 println("Timing run")
-run("queen10_10.txt")
-
+obj,y,x = run("miles250.txt")
+orig, sim = colors(x)
 
 
