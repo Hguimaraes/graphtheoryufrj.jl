@@ -33,7 +33,7 @@ function gurobi_coloring(G::Array{Array{Int64},1}, E)
 	h = convert(Int, sum(coloring(G)))
 	println("Greedy heuristic $h")
 
-	m = Model(solver=GurobiSolver(TimeLimit = 600))
+	m = Model(solver=GurobiSolver(TimeLimit = 3600, Method=0, MIPFocus=2, Cuts=3, MIPGap=0.03))
 
 	@defVar(m, x[1:n, 1:h], Bin)
 	@defVar(m, y[1:h], Bin)
@@ -57,7 +57,7 @@ function gurobi_coloring(G::Array{Array{Int64},1}, E)
 end
 
 function edges(G::Array{Array{Int64},1})
-	E = []
+	E = Tuple{Int,Int}[]
 	n = length(G)
 	for i in 1:n
 		for j in G[i]
@@ -67,13 +67,20 @@ function edges(G::Array{Array{Int64},1})
 	return E
 end
 
+function run(name)
+	g = graphtheoryufrj
+	G = g.simpleGraph(name)
+	G = G.Graph
+	E=edges(G)
 
-g = graphtheoryufrj
-G = g.simpleGraph("queen13_13.txt")
-G = G.Graph
-E=edges(G)
+	obj,y,x = gurobi_coloring(G, E)
+	println("Objective value of $obj")
+end
 
-obj,y,x = gurobi_coloring(G, E)
-println("Objective value of $obj")
+println("Compile run")
+run("g.txt")
+println("Timing run")
+run("queen10_10.txt")
+
 
 
