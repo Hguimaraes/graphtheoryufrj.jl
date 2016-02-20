@@ -1,35 +1,21 @@
-using DataStructures
-
-include("graphtheoryufrj.jl")
-include("random_graphs.jl")
-
-
 function dsatur(G::Array{Array{Int64},1})
 	l = length(G)
 	vertex_color = zeros(Int,l)
 	degrees = Array{Tuple{Int,Int}}(l)
 	satur = zeros(Int,l)
-
-
 	uncolored = Set(collect(1:l))
-
-
 	color_counter = 1
 
 	for i in 1:l
 		degrees[i] = (length(G[i]), i)
 	end
 
-
 	#coloring max degree vertex
 
 	max_deg_vertex = maximum(degrees)[2] 
 	vertex_color[max_deg_vertex] = color_counter
 
-
 	delete!(uncolored, max_deg_vertex)
-
-
 
 	#Increase saturation of max_degree_vertex neighbours
 	for j in G[max_deg_vertex]
@@ -64,14 +50,8 @@ function dsatur(G::Array{Array{Int64},1})
 			end
 		end
 
-
-
-
-
-		
 		# println("max satur vertices $max_satur_degree_vertices")
 		coloring = max_satur_degree_vertices[1]
-
 
 		if length(max_satur_degree_vertices) > 1 #if there are more than 1 vertex with max_satur, untie by max_degree
 			max_degree = -1
@@ -86,7 +66,6 @@ function dsatur(G::Array{Array{Int64},1})
 		end
 
 		# println("coloring vertex $coloring")
-
 
 		#Coloring
 		for number_color in 1:color_counter+1
@@ -111,7 +90,6 @@ function dsatur(G::Array{Array{Int64},1})
 				satur[j] +=1
 			end
 		end
-
 	end
 	return vertex_color
 end
@@ -126,31 +104,6 @@ function amount_color(node_indexes, color_number, vertex_color)
 	return color_counter
 end
 
-function colors(x::Array{Float64,2})
-	ret = Array{Int}(size(x)[1])
-	for i in 1:size(x)[1]
-		for j in 1:size(x)[2]
-			if x[i,j] == 1
-				ret[i]=j
-			end
-		end
-	end
-	ret2 = Array{Int}(size(x)[1])
-	c = 0
-	for i in Set(ret)
-		for j in find(ret .== i)
-			ret2[j] = c
-		end
-		c+=1
-	end
-	return ret, ret2
-end
 
-
-g = graphtheoryufrj
-G = g.simpleGraph("queen13_13.txt")
-G = G.Graph
-
-println("DSAT:",sum(Set(dsatur(G))))
 
 

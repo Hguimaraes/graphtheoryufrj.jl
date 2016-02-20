@@ -2,7 +2,7 @@ using JuMP, Gurobi, DataStructures
 
 include("graphtheoryufrj.jl")
 include("random_graphs.jl")
-
+include("dsatur.jl")
 
 function coloring(G::Array{Array{Int64},1})
 	l = length(G)
@@ -26,86 +26,15 @@ function coloring(G::Array{Array{Int64},1})
 	return colors
 end
 
-function dsatur(G::Array{Array{Int64},1})
-	l = length(G)
-	colors = zeros(Int,l)
-	vertex_color = zeros(Int,l)
-	degrees = Array{Tuple{Int,Int}}(l)
-	satur = zeros(Int,l)
-
-	for i in 1:l
-		degrees[i] = (length(G[i]), i)
-	end
-	sort!(degrees, rev = true)
-
-	#coloring max degree vertex
-	colors[1] = 1
-	vertex_color[degrees[1][2]] = 1
-
-	println("colors $colors")
-	println("vertex colors $vertex_color")
-
-	#find max saturation
-	for i in G
-		col = []
-		for j in i
-			if vertex_color[j] != 0
-				push!(col,j)
-			end
-		end
-		satur[i] = length(Set(col))
-	end
-
-	println("dsat $satur")
-
-	while !isempty(find(vertex_color .== 0))
-
-		_,i = findmax(satur)
-
-		col = []
-		for j in G[i]
-			if vertex_color[j] != 0
-				push!(col,j)
-			end
-		end
-
-		if !isempty(col)
-			cmin,_ = findmin(col)
-			cmax,_ = findmax(col)
-		else
-			c = 1 
-		end
-
-		if cmin == 1
-			colorWith = cmax + 1
-		else
-			colorWith = cmin - 1
-		end
-
-		colors[colorWith] = 1
-		vertex_color[i] = colorWith
-
-		for i in G
-			col = []
-			for j in i
-				if vertex_color[j] != 0
-					push!(col,j)
-				end
-			end
-			satur[i] = length(Set(col))
-		end
-
-	end
-
-	return colors
-end
-
-
 function gurobi_coloring(G::Array{Array{Int64},1}, E)
 
 	n = length(G)
-	h = convert(Int, sum(coloring(G)))
-	println("Greedy heuristic $h")
+	h1 = convert(Int, sum(coloring(G)))
+	h2 = convert(Int, sum(Set(dsatur(G))))
+	println("Simple greedy coloring $h1")
+	println("DSATUR greedy coloring $h2")
+
+	h = min(h1, h2)
 
 	m = Model(solver=GurobiSolver(TimeLimit = 600, PrePasses=1, Method=0, MIPFocus=2, Cuts=3, MIPGap=0.03))
 
@@ -146,6 +75,7 @@ function edges(G::Array{Array{Int64},1})
 end
 
 function run(name)
+	println("Coloring graph $name")
 	g = graphtheoryufrj
 	G = g.simpleGraph(name)
 	G = G.Graph
@@ -179,18 +109,14 @@ end
 
 
 
-# println("Compile run")
-# run("g.txt")
-# println("Timing run")
-# @time obj,y,x = run("queen5_5.txt")
-# orig, sim = colors(x)
+println("Compile run")
+run("g.txt")
 
-g = graphtheoryufrj
-G = g.simpleGraph("queen5_5.txt")
-G = G.Graph
-E=edges(G)
+println("=============================================================")
+println("Timing run")
+@time obj,y,x = run("myciel6.txt")
+orig, sim = colors(x)
 
-println("No priority coloring:",sum(coloring(G)))
-println("DSAT:",sum(dsatur(G)))
+
 
 
