@@ -1,4 +1,4 @@
-using JuMP, Gurobi
+using JuMP, Gurobi, DataStructures
 
 include("graphtheoryufrj.jl")
 include("random_graphs.jl")
@@ -24,8 +24,82 @@ function coloring(G::Array{Array{Int64},1})
 
 	end
 	return colors
-
 end
+
+function dsatur(G::Array{Array{Int64},1})
+	l = length(G)
+	colors = zeros(Int,l)
+	vertex_color = zeros(Int,l)
+	degrees = Array{Tuple{Int,Int}}(l)
+	satur = zeros(Int,l)
+
+	for i in 1:l
+		degrees[i] = (length(G[i]), i)
+	end
+	sort!(degrees, rev = true)
+
+	#coloring max degree vertex
+	colors[1] = 1
+	vertex_color[degrees[1][2]] = 1
+
+	println("colors $colors")
+	println("vertex colors $vertex_color")
+
+	#find max saturation
+	for i in G
+		col = []
+		for j in i
+			if vertex_color[j] != 0
+				push!(col,j)
+			end
+		end
+		satur[i] = length(Set(col))
+	end
+
+	println("dsat $satur")
+
+	while !isempty(find(vertex_color .== 0))
+
+		_,i = findmax(satur)
+
+		col = []
+		for j in G[i]
+			if vertex_color[j] != 0
+				push!(col,j)
+			end
+		end
+
+		if !isempty(col)
+			cmin,_ = findmin(col)
+			cmax,_ = findmax(col)
+		else
+			c = 1 
+		end
+
+		if cmin == 1
+			colorWith = cmax + 1
+		else
+			colorWith = cmin - 1
+		end
+
+		colors[colorWith] = 1
+		vertex_color[i] = colorWith
+
+		for i in G
+			col = []
+			for j in i
+				if vertex_color[j] != 0
+					push!(col,j)
+				end
+			end
+			satur[i] = length(Set(col))
+		end
+
+	end
+
+	return colors
+end
+
 
 function gurobi_coloring(G::Array{Array{Int64},1}, E)
 
@@ -33,13 +107,16 @@ function gurobi_coloring(G::Array{Array{Int64},1}, E)
 	h = convert(Int, sum(coloring(G)))
 	println("Greedy heuristic $h")
 
-	m = Model(solver=GurobiSolver(TimeLimit = 120, Method=0, MIPFocus=2, Cuts=3, MIPGap=0.03))
+	m = Model(solver=GurobiSolver(TimeLimit = 600, PrePasses=1, Method=0, MIPFocus=2, Cuts=3, MIPGap=0.03))
 
 	@defVar(m, x[1:n, 1:h], Bin)
 	@defVar(m, y[1:h], Bin)
 
 	@addConstraint(m, constr[i=1:n], sum{x[i,k], k=1:h} == 1 )
+	println("Added constrain 1")
+
 	@addConstraint(m, xyconstr[i=1:n, k=1:h], x[i,k] - y[k] <= 0)
+	println("Added constrain 2")
 
 	for e in E
 		for k in 1:h
@@ -48,6 +125,7 @@ function gurobi_coloring(G::Array{Array{Int64},1}, E)
 			@addConstraint(m, x[a,k] + x[b,k] <= 1)
 		end
 	end
+	println("Added constrain 3")
 
 	@setObjective(m, Min, sum{y[i], i=1:h})
 
@@ -98,10 +176,21 @@ function colors(x::Array{Float64,2})
 	return ret, ret2
 end
 
-println("Compile run")
-run("g.txt")
-println("Timing run")
-obj,y,x = run("miles250.txt")
-orig, sim = colors(x)
+
+
+
+# println("Compile run")
+# run("g.txt")
+# println("Timing run")
+# @time obj,y,x = run("queen5_5.txt")
+# orig, sim = colors(x)
+
+g = graphtheoryufrj
+G = g.simpleGraph("queen5_5.txt")
+G = G.Graph
+E=edges(G)
+
+println("No priority coloring:",sum(coloring(G)))
+println("DSAT:",sum(dsatur(G)))
 
 
