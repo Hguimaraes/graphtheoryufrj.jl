@@ -106,17 +106,39 @@ function colors(x::Array{Float64,2})
 	return ret, ret2
 end
 
+function coloring_correct(E, color)
+
+	err = 0
+	for i in E
+		if color[i[1]] == color[i[2]]
+			err+=1
+		end
+	end
+
+	if err == 0
+		return true
+	else
+		return err
+	end
+
+end
 
 
 
-println("Compile run")
-run("g.txt")
+# println("Compile run")
+# run("g.txt")
 
-println("=============================================================")
-println("Timing run")
-@time obj,y,x = run("myciel6.txt")
-orig, sim = colors(x)
+# println("=============================================================")
+# println("Timing run")
+# @time obj,y,x = run("latin_square_10.txt")
+# orig, sim = colors(x)
 
+g = graphtheoryufrj
+G = g.simpleGraph("latin_square_10.txt")
+G = G.Graph
+E=edges(G)
 
+color = dsatur(G)
+println(length(Set(color)))
 
 

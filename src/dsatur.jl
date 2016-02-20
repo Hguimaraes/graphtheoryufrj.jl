@@ -30,9 +30,7 @@ function dsatur(G::Array{Array{Int64},1})
 	# println("_______________________________________")
 	
 	coloring = 0
-	co = 0
-	while !isempty(uncolored) && co<10
-	co+=1	
+	while !isempty(uncolored)
 		# println("uncolored $uncolored")
 		# println("satur $satur")
 		# println("vertex color $vertex_color")
@@ -68,7 +66,7 @@ function dsatur(G::Array{Array{Int64},1})
 		# println("coloring vertex $coloring")
 
 		#Coloring
-		for number_color in 1:color_counter+1
+		for number_color in 1:color_counter
 			if amount_color(G[coloring], number_color, vertex_color) == 0
 				vertex_color[coloring] = number_color
 				break
