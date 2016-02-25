@@ -4,7 +4,7 @@ include("graphtheoryufrj.jl")
 include("random_graphs.jl")
 include("dsatur.jl")
 
-function coloring(G::Array{Array{Int64},1})
+function direct_coloring(G::Array{Array{Int64},1})
 	l = length(G)
 	colors = zeros(Int,l)
 	vertex_color = zeros(Int,l)
@@ -26,17 +26,17 @@ function coloring(G::Array{Array{Int64},1})
 	return colors
 end
 
-function gurobi_coloring(G::Array{Array{Int64},1}, E)
+function gurobi_coloring(G::Array{Array{Int64},1}, E, tmax, r)
 
 	n = length(G)
-	h1 = convert(Int, sum(coloring(G)))
-	h2 = convert(Int, sum(Set(dsatur(G))))
-	println("Simple greedy coloring $h1")
-	println("DSATUR greedy coloring $h2")
+	h = convert(Int, length(Set(dsatur(G))))
+	println("DSATUR greedy coloring $h")
+	if h-r > 0
+		h = h-r
+	end
+	println("Solving for DSATUR - $r colors = $h")
 
-	h = min(h1, h2)
-
-	m = Model(solver=GurobiSolver(TimeLimit = 600, PrePasses=1, Method=0, MIPFocus=2, Cuts=3, MIPGap=0.03))
+	m = Model(solver=GurobiSolver(TimeLimit = tmax, Method=-1, MIPFocus=1, Cuts=3, MIPGap=0.1))
 
 	@defVar(m, x[1:n, 1:h], Bin)
 	@defVar(m, y[1:h], Bin)
@@ -58,9 +58,9 @@ function gurobi_coloring(G::Array{Array{Int64},1}, E)
 
 	@setObjective(m, Min, sum{y[i], i=1:h})
 
-	@time solve(m)
+	@time status = solve(m)
 
-	return getObjectiveValue(m), getValue(y), getValue(x)
+	return getObjectiveValue(m), getValue(y), getValue(x), status
 end
 
 function edges(G::Array{Array{Int64},1})
@@ -74,16 +74,25 @@ function edges(G::Array{Array{Int64},1})
 	return E
 end
 
-function run(name)
+function load(name)
+	println("Loading graph $name")
+	g = graphtheoryufrj
+	G = g.simpleGraph(name)
+	G = G.Graph
+	E=edges(G)
+	return G,E
+end
+
+function run(name, tmax, r)
 	println("Coloring graph $name")
 	g = graphtheoryufrj
 	G = g.simpleGraph(name)
 	G = G.Graph
 	E=edges(G)
 
-	obj,y,x = gurobi_coloring(G, E)
+	obj,y,x,status = gurobi_coloring(G, E, tmax, r)
 	println("Objective value of $obj")
-	return obj,y,x
+	return obj,y,x,status
 end
 
 function colors(x::Array{Float64,2})
@@ -123,22 +132,67 @@ function coloring_correct(E, color)
 
 end
 
+function color_report(i, tmax, r)
+	name = "G$(i).txt"
+
+	t = @elapsed obj,y,x,status = run(name, tmax, r)
+	_,sim = colors(x)
+
+	f = open("$(time())color_$(name)", "w")
+	write(f, "optimization status = $(status)\n")
+	write(f, "chromatic number = $(obj)\n")
+	write(f, "runtime = $(t)\n")
+	write(f, "$(sim)\n")
+	close(f)
+end
+
+# l = ["dsjc1000_9.txt", "dsjc1000_5.txt", "dsjc1000_1.txt", "dsjc500_9.txt", "dsjc500_5.txt", "dsjc500_1.txt"]
+# for i in l
+# 	name = i
+# 	g = graphtheoryufrj
+# 	println("Graph $(name)")
+# 	@time G = g.simpleGraph(name)
+# 	G = G.Graph
+# 	E=edges(G)
+# 	t = @elapsed d = length(Set(dsatur(G)))
+# 	println("K = $(d), time = $(t)")
+# 	println("=========================================")
+# end
+# l = []
+
+# for i in 1:20
+# 	name = "G$(i).txt"
+# 	g = graphtheoryufrj
+# 	G = g.simpleGraph(name)
+# 	G = G.Graph
+# 	E=edges(G)
+# 	d = length(Set(dsatur(G)))
+
+# 	push!(l, (d*length(E), name))
+# end
+
+# # DRIVER PROGRAM
+println("Compile run")
+run("g.txt", 10, 0)
+println("==================================================")
+cd("t3")
+color_report(4, 60*10, 1)
+color_report(6, 60*10, 1)
 
 
-# println("Compile run")
-# run("g.txt")
 
-# println("=============================================================")
-# println("Timing run")
-# @time obj,y,x = run("latin_square_10.txt")
-# orig, sim = colors(x)
-
-g = graphtheoryufrj
-G = g.simpleGraph("latin_square_10.txt")
-G = G.Graph
-E=edges(G)
-
-color = dsatur(G)
-println(length(Set(color)))
-
-
+## RUN AND SAVE JUST GREEDY REPORT
+# cd("t3")
+# name = "G18.txt"
+# g = graphtheoryufrj
+# G = g.simpleGraph(name)
+# G = G.Graph
+# E=edges(G)
+# t = @elapsed d = dsatur(G)
+# obj = length(Set(d))
+# f = open("color_$(name)", "w")
+# write(f, "optimization status = greedy\n")
+# write(f, "chromatic number = $(obj)\n")
+# write(f, "runtime = $(t)\n")
+# write(f, "$(d)\n")
+# close(f)
