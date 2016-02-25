@@ -3,7 +3,9 @@ using Base.Test
 
 include("ratton_first_assignment.jl")
 include("ratton_second_assignment.jl")
-
+"""
+First assignment: Basics of a graph package (Modeling, BFS, DFS...)
+"""
 FLAG_RATTON_ASSIGNMENT01 = false
 infile_name = "../assets/as_graph.txt"
 outfile_name = "parents_q4.txt"
@@ -32,7 +34,10 @@ if FLAG_RATTON_ASSIGNMENT01
 	@test test_seven(infile_name) == "TEST_SEVEN_SUCESS"
 end
 
-FLAG_RATTON_ASSIGNMENT02 = true
+"""
+First assignment: Extending the graph package (Dijkstra, Floyd-Warshall...)
+"""
+FLAG_RATTON_ASSIGNMENT02 = false
 algorithm = prim_mst
 initial_vertex_mst = 20
 infile_name = ["../assets/grafo_1.txt",
@@ -44,10 +49,10 @@ infile_name = ["../assets/grafo_1.txt",
 if FLAG_RATTON_ASSIGNMENT02
 	for i in infile_name
 		#
-		#@test test_one(i) == "TEST_ONE_SUCESS"
+		@test test_one(i) == "TEST_ONE_SUCESS"
 
 		#
-		#@test test_two(i, algorithm, initial_vertex_mst) == "TEST_TWO_SUCESS"
+		@test test_two(i, algorithm, initial_vertex_mst) == "TEST_TWO_SUCESS"
 
 		#
 		@test test_three(i) == "TEST_THREE_SUCESS"
@@ -55,9 +60,9 @@ if FLAG_RATTON_ASSIGNMENT02
 	end
 
 	#
-	#@test test_colab_one() == "TEST_COLAB_ONE_SUCESS"
+	@test test_colab_one() == "TEST_COLAB_ONE_SUCESS"
 
 	#
-	#@test test_colab_two() == "TEST_COLAB_TWO_SUCESS"
+	@test test_colab_two() == "TEST_COLAB_TWO_SUCESS"
 
 end
