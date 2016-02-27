@@ -1,7 +1,6 @@
-#
-#
-#
-#
+# graphtheoryufrj.jl
+# Authors : Heitor Guimaraes and Luiz Ciafrino
+# @brief: Package control file with include of all files and functions.
 
 module graphtheoryufrj
 using DataStructures, Compat
@@ -26,6 +25,25 @@ export
 	mean_distance_dijkstra,
 	mean_distance_fw,
 
+	# Graph_Coloring
+	direct_coloring,
+	gurobi_coloring,
+	edges,
+	load,
+	run,
+	colors,
+	coloring_correct,
+	color_report,
+
+	#DSATUR
+	run_dsatur_heuristc,
+	run_optdsatur_heuristc,
+	dsatur,
+	optdsatur,
+	iteratedGreedy,
+	localSearch,
+	colorGraph,
+
 	# Plot data
 	plot_graph,
 	plot_bfs,
@@ -34,6 +52,8 @@ export
 # Load source files
 include("graphstructure.jl")
 include("algorithms.jl")
+include("graph_coloring.jl")
+include("dsatur.jl")
 include("plot.jl")
 
 end
