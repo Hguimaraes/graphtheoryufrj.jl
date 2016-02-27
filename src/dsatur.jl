@@ -1,3 +1,27 @@
+#
+#
+#
+
+function run_dsatur_heuristc(infile_name::ASCIIString)
+	# Read the graph from the disk (as adjacency list)
+	G = simpleGraph(infile_name)
+
+	# Apply the dsatur method
+	number_color, vertex_color = dsatur(G.Graph)
+
+	# Improve the coloring using Iterated Greedy techniques
+
+	# Improve the coloring using min-conflicts local search
+
+	# Return the coloring
+
+end
+
+function run_optdsatur_heuristc()
+end
+
+
+
 function dsatur(G::Array{Array{Int64},1})
 	l = length(G)
 	vertex_color = zeros(Int,l)
@@ -22,19 +46,9 @@ function dsatur(G::Array{Array{Int64},1})
 		satur[j]+=1
 	end
 
-	# println("Initial status")
-	# println("Degrees $degrees")
-	# println("uncolored $uncolored")
-	# println("satur $satur")
-	# println("vertex color $vertex_color")
-	# println("_______________________________________")
-	
 	coloring = 0
 	while !isempty(uncolored)
-		# println("uncolored $uncolored")
-		# println("satur $satur")
-		# println("vertex color $vertex_color")
-
+		
 		max_satur_degree_vertices = []
 		aux = []
 		for i in uncolored	
@@ -48,10 +62,10 @@ function dsatur(G::Array{Array{Int64},1})
 			end
 		end
 
-		# println("max satur vertices $max_satur_degree_vertices")
 		coloring = max_satur_degree_vertices[1]
 
-		if length(max_satur_degree_vertices) > 1 #if there are more than 1 vertex with max_satur, untie by max_degree
+		# If there are more than 1 vertex with max_satur, untie by max_degree
+		if length(max_satur_degree_vertices) > 1
 			max_degree = -1
 			node_index = -1
 			for i in max_satur_degree_vertices
@@ -63,9 +77,18 @@ function dsatur(G::Array{Array{Int64},1})
 			end
 		end
 
-		# println("coloring vertex $coloring")
+		# Closure to return how many vertex have some color.
+		function amount_color(node_indexes, color_number, vertex_color)
+			color_counter = 0
+			for i in node_indexes
+				if vertex_color[i] == color_number
+					color_counter +=1
+				end
+			end
+			return color_counter
+		end
 
-		#Coloring
+		# Coloring
 		for number_color in 1:color_counter
 			if amount_color(G[coloring], number_color, vertex_color) == 0
 				vertex_color[coloring] = number_color
@@ -80,28 +103,26 @@ function dsatur(G::Array{Array{Int64},1})
 		end
 
 		delete!(uncolored, coloring)
-		# println("colored one more, uncolored $uncolored")
-		# println("_______________________________________")
-
+		
 		for j in G[coloring]
 			if amount_color(G[j], vertex_color[coloring], vertex_color) == 1
 				satur[j] +=1
 			end
 		end
 	end
-	return vertex_color
+	return number_color, vertex_color
 end
 
-function amount_color(node_indexes, color_number, vertex_color)
-	color_counter = 0
-	for i in node_indexes
-		if vertex_color[i] == color_number
-			color_counter +=1
-		end
-	end
-	return color_counter
+function optdsatur()
 end
 
+function iteratedGreedy()
+	
+end
 
+function localSearch()
 
+end
 
+type colorGraph
+end
