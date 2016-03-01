@@ -1,8 +1,8 @@
-using JuMP, Gurobi, DataStructures
+# graphstructure.jl
+# Authors : Heitor Guimaraes and Luiz Ciafrino
+# @brief: Module with some optimization algorithms to solve graph coloring
 
-include("graphtheoryufrj.jl")
-include("random_graphs.jl")
-include("dsatur.jl")
+#=using JuMP, Gurobi
 
 function direct_coloring(G::Array{Array{Int64},1})
 	l = length(G)
@@ -196,3 +196,4 @@ color_report(6, 60*10, 1)
 # write(f, "runtime = $(t)\n")
 # write(f, "$(d)\n")
 # close(f)
+=#

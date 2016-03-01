@@ -11,5 +11,11 @@ A Julia package with graph algorithms for the course <i>"Graph Theory" (COS242)<
     using graphtheoryufrj
 ```
 
-## Performance test
+## Dependencies
+ All the dependencies are in the REQUIRE file and will be download when you clone the package. But in order to run the "graph_coloring.jl" you need to install the Gurobi Solver and the package associated by:
 
+ ```Julia
+     Pkg.add("Gurobi")
+```
+
+## Performance test
